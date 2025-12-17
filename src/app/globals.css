@@ -1,26 +1,22 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  /* Define Brand Colors from Roxy Coslab PDF */
+  --color-roxy-graphite: #8a8d92;
+  --color-roxy-black: #1e1e1e;
+  --color-roxy-beige: #e8dccf;
+  --color-roxy-mint: #d9efe7;
+  --color-roxy-white: #ffffff;
+
+  /* Define Fonts (Linked to layout.tsx variables) */
+  --font-sans: var(--font-montserrat), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-roboto-mono), ui-monospace, SFMono-Regular, monospace;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
+/* Base Styles */
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--color-roxy-white);
+  color: var(--color-roxy-black);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
 }
