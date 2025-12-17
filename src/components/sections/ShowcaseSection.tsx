@@ -101,13 +101,6 @@ export default function ShowcaseSection() {
           <ProductCard key={product.id} product={product} index={index} />
         ))}
       </div>
-
-      {/* Final Footer Spacer */}
-      <div className="h-[20vh] bg-roxy-black text-white flex items-center justify-center z-20 relative">
-        <p className="font-mono text-sm opacity-50">
-          © 2025 ROXY COSLAB. ALL RIGHTS RESERVED.
-        </p>
-      </div>
     </section>
   );
 }

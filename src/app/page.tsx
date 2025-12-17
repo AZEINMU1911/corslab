@@ -6,6 +6,7 @@ import VisionMission from "@/components/sections/VisionMission";
 import WaveSection from "@/components/sections/WaveSection";
 import ShowcaseSection from "@/components/sections/ShowcaseSection";
 import ProcessSection from "@/components/sections/ProcessSection";
+import FAQSection from "@/components/sections/FAQSection";
 
 export default function Home() {
   return (
@@ -17,6 +18,7 @@ export default function Home() {
       <VisionMission />
       <WaveSection />
       <ProcessSection />
+      <FAQSection />
       <ShowcaseSection />
     </main>
   );

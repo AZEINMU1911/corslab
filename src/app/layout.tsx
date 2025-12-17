@@ -1,24 +1,18 @@
 import type { Metadata } from "next";
-import { Montserrat, Roboto_Mono } from "next/font/google";
+import { Inter, Montserrat } from "next/font/google"; // Assuming these are your fonts
 import "./globals.css";
 
-// 1. Configure Montserrat (Brand Headings & Body)
-const montserrat = Montserrat({
-  variable: "--font-montserrat",
-  subsets: ["latin"],
-  display: "swap",
-});
+import Navbar from "@/components/layouts/Navbar"; // 👈 Import Navbar
+import Footer from "@/components/layouts/Footer"; // 👈 Import Footer
 
-// 2. Configure Roboto Mono (Technical Specs)
-const robotoMono = Roboto_Mono({
-  variable: "--font-roboto-mono",
+const montserrat = Montserrat({
   subsets: ["latin"],
-  display: "swap",
+  variable: "--font-montserrat",
 });
 
 export const metadata: Metadata = {
   title: "Roxy CosLab | Trusted OEM Partner",
-  description: "Manufacturing excellence for skincare and bodycare.",
+  description: "Manufacturing excellence for your beauty brand.",
 };
 
 export default function RootLayout({
@@ -28,10 +22,15 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${montserrat.variable} ${robotoMono.variable} antialiased`}
-      >
+      <body className={montserrat.className}>
+        {/* 1. Navbar goes here (Fixed to top) */}
+        <Navbar />
+
+        {/* 2. Main Page Content */}
         {children}
+
+        {/* 3. Footer goes here (Stays at bottom) */}
+        <Footer />
       </body>
     </html>
   );
