@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Montserrat } from "next/font/google"; // Assuming these are your fonts
+import { Montserrat } from "next/font/google"; // Assuming these are your fonts
 import "./globals.css";
 
 import Navbar from "@/components/layouts/Navbar"; // 👈 Import Navbar
