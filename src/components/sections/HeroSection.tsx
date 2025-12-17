@@ -6,7 +6,11 @@ import { Plus } from "lucide-react";
 export default function HeroSection() {
   return (
     <section className="relative h-screen w-full flex flex-col justify-center items-center px-6 overflow-hidden">
-      {/* 1. Clinical Decoration (Top Left) */}
+      {/* ⚠️ PLACE ASSET HERE: Optional Hero Background
+          If the design requires a photo, place an absolute <Image /> or <video> here with z-0.
+          Current: bg-roxy-white (Clean Style)
+      */}
+
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -16,7 +20,6 @@ export default function HeroSection() {
         <Plus size={24} strokeWidth={1.5} />
       </motion.div>
 
-      {/* 2. Main Headline - Staggered Animation */}
       <div className="max-w-5xl mx-auto text-center z-10">
         <motion.h1
           initial={{ opacity: 0, y: 30 }}
@@ -30,7 +33,6 @@ export default function HeroSection() {
           Your Trusted Partner.
         </motion.h1>
 
-        {/* 3. Subheadline */}
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -47,7 +49,6 @@ export default function HeroSection() {
         </motion.p>
       </div>
 
-      {/* 4. The "Black Dot" Accent (Visual Anchor) */}
       <motion.div
         initial={{ scale: 0 }}
         animate={{ scale: 1 }}

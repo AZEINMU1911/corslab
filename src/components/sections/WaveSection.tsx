@@ -2,86 +2,82 @@
 
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef } from "react";
+import Image from "next/image";
 
 export default function WaveSection() {
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // 1. Track Scroll Progress relative to this section
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ["start end", "end start"],
   });
 
-  // 2. Map scroll to animations
-  // Scale: Grows from 90% size to 100% full width
-  const scale = useTransform(scrollYProgress, [0, 0.4], [0.9, 1]);
-  // Radius: Sharpens from rounded corners to flat edges
-  const borderRadius = useTransform(scrollYProgress, [0, 0.4], [24, 0]);
+  // 1. CONTAINER SCALE: Expands to full width early (by 30%)
+  const scale = useTransform(scrollYProgress, [0, 0.3], [0.8, 1]);
+  const borderRadius = useTransform(scrollYProgress, [0, 0.3], [40, 0]);
 
-  // Logo Opacity: Fades OUT quickly as you scroll in
-  const logoOpacity = useTransform(scrollYProgress, [0.2, 0.5], [1, 0]);
-  const logoY = useTransform(scrollYProgress, [0.2, 0.5], [0, -50]); // Moves up slightly while fading
+  // 2. LOGO SEQUENCE:
+  // Visible at start, fades OUT completely between 30% and 40%
+  const logoOpacity = useTransform(scrollYProgress, [0.3, 0.4], [1, 0]);
 
-  // Text Opacity: Fades IN after the logo is gone
-  const textOpacity = useTransform(scrollYProgress, [0.5, 0.7], [0, 1]);
-  const textY = useTransform(scrollYProgress, [0.5, 0.7], [100, 0]); // Moves up from bottom
+  // 3. TEXT SEQUENCE ("Movie Credits" Style):
+  // Starts invisible/low. Rises UP from the bottom.
+  // Starts moving at 45% (after logo is gone), lands at 70%.
+  // Stays locked in place from 70% to 100% so you can read it.
+
+  // Opacity: Quick fade in so it doesn't "pop"
+  const textOpacity = useTransform(scrollYProgress, [0.4, 0.5], [0, 1]);
+
+  // Vertical Movement: Starts 150px down, slides UP to 0px
+  const textY = useTransform(scrollYProgress, [0.4, 0.7], [150, 0]);
 
   return (
-    <div ref={containerRef} className="relative h-[150vh] bg-roxy-white">
-      {/* Sticky wrapper to keep video in view while we perform the animation */}
+    <div ref={containerRef} className="relative h-[250vh] bg-roxy-white">
       <div className="sticky top-0 h-screen flex items-center justify-center overflow-hidden">
-        {/* The Expandable Video Container */}
         <motion.div
           style={{ scale, borderRadius }}
           className="relative w-full h-full max-h-screen bg-roxy-black overflow-hidden shadow-2xl"
         >
-          {/* PLACEHOLDER VIDEO BACKGROUND */}
-          {/* Once you have your .mp4, replace this div with: 
-              <video autoPlay loop muted playsInline className="absolute inset-0 w-full h-full object-cover opacity-80" src="/your-video.mp4" /> 
-          */}
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--color-roxy-graphite)_0%,_#000000_100%)] opacity-80" />
+          {/* VIDEO BACKGROUND */}
+          <video
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="absolute inset-0 w-full h-full object-cover opacity-80"
+            src="/assets/wave.mp4"
+          />
 
-          {/* Optional: Animated Gradient to simulate 'water' movement if no video yet */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-black opacity-60" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,#000000_100%)] opacity-60" />
 
-          {/* CENTER CONTENT */}
-          <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center z-10">
-            {/* A. The Logo (Fades Out) */}
+          {/* CONTENT CONTAINER */}
+          {/* Aligned to the LEFT (items-start) */}
+          <div className="absolute inset-0 flex flex-col justify-center px-6 md:px-24 z-10">
+            {/* A. LOGO (Centered Absolutely) */}
+            {/* Kept separate so it doesn't mess up the text alignment */}
             <motion.div
-              style={{ opacity: logoOpacity, y: logoY }}
-              className="absolute"
+              style={{ opacity: logoOpacity }}
+              className="absolute inset-0 flex items-center justify-center pointer-events-none"
             >
-              {/* This is the 'R' Icon placeholder */}
-              <svg
-                width="100"
-                height="100"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="white"
-                strokeWidth="1"
-                className="opacity-90"
-              >
-                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
-                <path d="M12 8v8" />
-                <path d="M8 12h8" />
-              </svg>
-              <p className="mt-4 text-white font-mono tracking-[0.3em] text-sm">
-                COSLAB
-              </p>
+              <div className="relative w-32 h-32 md:w-48 md:h-48">
+                <Image
+                  src="/CoslabWhite.png"
+                  alt="Roxy Coslab Logo"
+                  fill
+                  className="object-contain"
+                  priority
+                />
+              </div>
             </motion.div>
 
-            {/* B. The Text (Rises Up) */}
+            {/* B. TEXT (Left Aligned & Sliding Up) */}
             <motion.div
               style={{ opacity: textOpacity, y: textY }}
-              className="max-w-5xl"
+              className="max-w-6xl text-left"
             >
-              <h2 className="text-4xl md:text-6xl lg:text-8xl font-medium text-white leading-[1.1] tracking-tight">
-                Manufacturing excellence <br />
-                <span className="text-roxy-graphite italic font-light">
-                  where global standards
-                </span>{" "}
-                <br />
-                meet your unique brand vision.
+              <h2 className="text-4xl md:text-6xl lg:text-8xl font-medium text-white leading-[1.05] tracking-tight">
+                Manufacturing excellence where global standards meet your unique
+                brand vision.
               </h2>
             </motion.div>
           </div>

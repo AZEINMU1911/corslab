@@ -3,96 +3,90 @@
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef } from "react";
 import Image from "next/image";
+import type { Product } from "@/types";
 
-// Placeholder data based on your screenshots
-const products = [
+const products: Product[] = [
   {
     id: "01",
     title: "Organic Radiance",
-    subtitle: "Ophélie Serum",
-    category: "SKINCARE",
-    color: "bg-[#EAE4DC]", // Beige/Paper texture color
-    textColor: "text-roxy-black",
-    imgUrl: "/placeholder-serum.jpg", // You will replace this later
+    subtitle: "Clean beauty formulations derived from nature's best.",
+    category: "Series",
+    color: "bg-[#EAE4DC]",
+    textColor: "text-white",
+    imgUrl: "/assets/2.jpg",
   },
   {
     id: "02",
     title: "Luxury Age-Defying",
-    subtitle: "Night Repair",
-    category: "ANTI-AGING",
-    color: "bg-[#2A2A2A]", // Dark luxury color
-    textColor: "text-roxy-white",
-    imgUrl: "/placeholder-dark.jpg",
+    subtitle: "Premium potent ingredients tailored for timeless beauty.",
+    category: "Collection",
+    color: "bg-[#2A2A2A]",
+    textColor: "text-white",
+    imgUrl: "/assets/3.jpg",
   },
   {
     id: "03",
-    title: "Body Wellness",
-    subtitle: "Silk Lotion",
-    category: "BODYCARE",
-    color: "bg-[#D9EFE7]", // Brand Mint
-    textColor: "text-roxy-black",
-    imgUrl: "/placeholder-mint.jpg",
+    title: "Modern Urban Daily",
+    subtitle: "Functional, fast-absorbing skincare for the modern lifestyle.",
+    category: "Essentials",
+    color: "bg-[#D9EFE7]",
+    textColor: "text-white",
+    imgUrl: "/assets/5.jpg",
   },
 ];
 
-function ProductCard({ product, index }: { product: any; index: number }) {
+function ProductCard({ product, index }: { product: Product; index: number }) {
   const containerRef = useRef(null);
 
-  // Create a slight parallax effect for the text inside the card
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ["start end", "start start"],
   });
 
-  const textY = useTransform(scrollYProgress, [0, 1], [50, 0]);
-  const opacity = useTransform(scrollYProgress, [0, 0.5], [0, 1]);
+  // Parallax Text: Moves slightly slower than the background
+  const y = useTransform(scrollYProgress, [0, 1], [100, -50]);
+
+  // FIX 1: Opacity only fades IN (0 to 1) and stays at 1. It does not fade out.
+  const opacity = useTransform(scrollYProgress, [0, 0.3], [0, 1]);
 
   return (
     <div
       ref={containerRef}
-      className={`sticky top-0 h-screen w-full flex items-center justify-center overflow-hidden ${product.color}`}
+      className="sticky top-0 h-screen w-full overflow-hidden"
     >
-      <div className="relative w-full max-w-7xl px-6 grid grid-cols-1 md:grid-cols-2 gap-12 items-center h-full">
-        {/* Left Side: Text Content */}
-        <motion.div
-          style={{ y: textY, opacity }}
-          className="relative z-10 flex flex-col justify-center order-2 md:order-1"
-        >
-          <span
-            className={`text-xs font-mono tracking-widest mb-4 opacity-60 ${product.textColor}`}
-          >
-            {product.id} — {product.category}
-          </span>
-          <h2
-            className={`text-5xl md:text-7xl lg:text-8xl font-semibold tracking-tight leading-[0.9] mb-4 ${product.textColor}`}
-          >
-            {product.title}
-          </h2>
-          <p
-            className={`text-xl md:text-2xl font-light opacity-80 ${product.textColor}`}
-          >
-            {product.subtitle}
-          </p>
+      {/* 1. Full Screen Background Image */}
+      <div className="absolute inset-0 w-full h-full">
+        <Image
+          src={product.imgUrl}
+          alt={product.title}
+          fill
+          className="object-cover"
+          priority={index === 0}
+        />
+        {/* Subtle Dark Overlay to ensure text readability */}
+        <div className="absolute inset-0 bg-black/20" />
+      </div>
 
-          <button
-            className={`mt-12 w-fit px-8 py-4 rounded-full border border-current text-sm font-medium uppercase tracking-wider hover:opacity-50 transition-opacity ${product.textColor}`}
-          >
-            View Formulation
-          </button>
-        </motion.div>
-
-        {/* Right Side: Image Placeholder */}
-        <div className="relative h-[50vh] md:h-[70vh] w-full order-1 md:order-2 flex items-center justify-center">
-          {/* Once you have real images:
-                <Image src={product.imgUrl} alt={product.title} fill className="object-contain" />
-             */}
-          <div className="w-64 h-96 bg-black/5 rounded-full blur-3xl absolute" />
-          <div className="relative w-full h-full border border-current opacity-20 flex items-center justify-center rounded-lg">
-            <span className={`font-mono text-xs ${product.textColor}`}>
-              [ Product Image Area ]
+      {/* 2. Centered Text Overlay */}
+      <div className="relative z-10 w-full h-full flex flex-col items-center justify-center text-center px-4">
+        <motion.div style={{ y, opacity }} className="max-w-4xl space-y-6">
+          {/* FIX 2: Removed the Dot, kept only the ID */}
+          <div className="flex flex-col items-center gap-4 mb-2">
+            <span className="font-mono text-sm tracking-widest text-white/90 uppercase border border-white/30 px-3 py-1 rounded-full backdrop-blur-md">
+              {product.id} — {product.category}
             </span>
           </div>
-        </div>
+
+          {/* Large Editorial Headline */}
+          <h2 className="text-5xl md:text-7xl lg:text-8xl font-semibold tracking-tight leading-[0.9] text-white drop-shadow-md">
+            {product.title}
+          </h2>
+
+          {/* Subtitle */}
+          <p className="text-lg md:text-2xl font-light text-white/90 max-w-2xl mx-auto drop-shadow-sm">
+            {product.subtitle}
+          </p>
+        </motion.div>
       </div>
     </div>
   );
@@ -101,26 +95,15 @@ function ProductCard({ product, index }: { product: any; index: number }) {
 export default function ShowcaseSection() {
   return (
     <section className="relative w-full bg-roxy-white">
-      {/* Introduction Title */}
-      <div className="py-24 md:py-32 text-center px-6">
-        <h2 className="text-3xl md:text-5xl font-light tracking-wide text-roxy-black">
-          Build Your Beauty Brand <br /> with a{" "}
-          <span className="font-semibold">Trusted Lab</span>
-        </h2>
-        <button className="mt-8 px-8 py-3 bg-roxy-beige text-roxy-black font-semibold rounded-sm">
-          Start Maklon Now
-        </button>
-      </div>
-
-      {/* The Stack */}
+      {/* The Sticky Stack */}
       <div className="relative">
         {products.map((product, index) => (
           <ProductCard key={product.id} product={product} index={index} />
         ))}
       </div>
 
-      {/* Footer Spacer */}
-      <div className="h-[20vh] bg-roxy-black text-white flex items-center justify-center">
+      {/* Final Footer Spacer */}
+      <div className="h-[20vh] bg-roxy-black text-white flex items-center justify-center z-20 relative">
         <p className="font-mono text-sm opacity-50">
           © 2025 ROXY COSLAB. ALL RIGHTS RESERVED.
         </p>

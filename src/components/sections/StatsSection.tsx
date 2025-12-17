@@ -3,12 +3,13 @@
 import { Container } from "@/components/ui/Container";
 import { motion, useSpring, useInView, useMotionValue } from "framer-motion";
 import { useEffect, useRef } from "react";
+import type { StatItem } from "@/types";
 
-const stats = [
-  { value: "15", label: "YEARS" },
-  { value: "44", label: "PROJECTS" },
-  { value: "8", label: "AWARDS" },
-  { value: "32", label: "CLIENTS" },
+const stats: StatItem[] = [
+  { value: "9999", label: "YEARS" },
+  { value: "9999", label: "PROJECTS" },
+  { value: "80000", label: "AWARDS" },
+  { value: "1", label: "CLIENTS" },
 ];
 
 function Counter({ value }: { value: string }) {
