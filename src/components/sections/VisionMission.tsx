@@ -1,14 +1,22 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Container } from "@/components/ui/Container"; // Reusing your container
+import { Container } from "@/components/ui/Container";
 
+/**
+ * VisionMission
+ * - Two copy blocks ("Vision" and "Mission") with simple in-view fade/slide.
+ *
+ * Common edits:
+ * - Copy: update the two `<p>` text nodes below
+ * - Layout: adjust the grid columns / spacing in the wrapper divs
+ */
 export default function VisionMission() {
   return (
     <section className="bg-roxy-white py-32">
       <Container>
         <div className="grid grid-cols-1 md:grid-cols-12 gap-12 items-start">
-          {/* Left Decoration */}
+          {/* Left-side decorative plus mark (desktop only). */}
           <div className="md:col-span-2 hidden md:block pt-2">
             <svg
               width="24"
@@ -23,9 +31,8 @@ export default function VisionMission() {
             </svg>
           </div>
 
-          {/* Text Content */}
+          {/* Right-side content stack (Vision + Mission). */}
           <div className="md:col-span-10 space-y-16 max-w-4xl">
-            {/* Vision */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -41,7 +48,6 @@ export default function VisionMission() {
               </p>
             </motion.div>
 
-            {/* Mission */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}

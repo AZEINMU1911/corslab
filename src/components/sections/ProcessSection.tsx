@@ -3,6 +3,14 @@
 import { motion, type Variants } from "framer-motion";
 import { Container } from "@/components/ui/Container";
 
+/**
+ * ProcessSection
+ * - Simple 4-step process list with per-row in-view reveal animation.
+ *
+ * Common edits:
+ * - Steps copy/order: update the `steps` array
+ * - Animation: tweak `itemVariants` or the `viewport` margin per row
+ */
 const steps = [
   {
     id: "01",
@@ -30,7 +38,7 @@ const steps = [
   },
 ];
 
-// Single Item Animation
+// Reusable Framer Motion variants applied to each row in the steps list.
 const itemVariants: Variants = {
   hidden: {
     opacity: 0,
@@ -50,7 +58,7 @@ export default function ProcessSection() {
   return (
     <section className="bg-roxy-white py-24">
       <Container>
-        {/* 1. Header (Triggered separately so it's always seen first) */}
+        {/* Section title and step count. */}
         <div className="mb-16 flex items-baseline gap-4">
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
@@ -65,7 +73,7 @@ export default function ProcessSection() {
           </span>
         </div>
 
-        {/* 2. The List */}
+        {/* Steps list (each row animates into view once). */}
         <div className="flex flex-col border-t border-roxy-graphite/20">
           {steps.map((step) => (
             <motion.div
@@ -73,10 +81,9 @@ export default function ProcessSection() {
               variants={itemVariants}
               initial="hidden"
               whileInView="visible"
-              viewport={{ once: true, margin: "-50px" }} // 👈 Triggers ONLY when this specific item is scrolled to
+              viewport={{ once: true, margin: "-50px" }}
               className="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-12 py-8 border-b border-roxy-graphite/20 group cursor-default"
             >
-              {/* Column 1: Number & Title */}
               <div className="md:col-span-4 flex items-baseline gap-6">
                 <span className="font-mono text-sm text-roxy-black font-bold tracking-widest">
                   {step.id}
@@ -86,7 +93,6 @@ export default function ProcessSection() {
                 </h3>
               </div>
 
-              {/* Column 2: Description */}
               <div className="md:col-span-8">
                 <p className="text-xl md:text-2xl font-light text-roxy-black leading-relaxed opacity-90">
                   {step.description}

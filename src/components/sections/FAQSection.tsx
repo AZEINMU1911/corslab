@@ -12,7 +12,16 @@ import Image from "next/image";
 import { Plus, Minus } from "lucide-react";
 import type { FAQItemData } from "@/types";
 
-// --- DATA ---
+/**
+ * FAQSection
+ * - Accordion list (single-open item) driven by local state (`openId`)
+ * - Includes an "UnfurlingImage" interlude: clipPath reveal + subtle parallax
+ *
+ * Common edits:
+ * - FAQ content: update the `faqs` array
+ * - Interlude image: update `src="/assets/6.jpg"` inside `UnfurlingImage`
+ * - Accordion motion: tweak the `AnimatePresence` transitions in `FAQItem`
+ */
 const faqs: FAQItemData[] = [
   {
     id: "01",
@@ -40,7 +49,7 @@ const faqs: FAQItemData[] = [
   },
 ];
 
-// --- SUB-COMPONENT: ACCORDION ITEM ---
+// Single accordion row: question button + animated expand/collapse answer panel.
 function FAQItem({
   item,
   isOpen,
@@ -65,7 +74,6 @@ function FAQItem({
           </h3>
         </div>
 
-        {/* Animated Icon */}
         <div className="relative w-6 h-6 flex-shrink-0 text-roxy-black mt-1">
           <motion.div
             initial={false}
@@ -105,7 +113,8 @@ function FAQItem({
   );
 }
 
-// --- SUB-COMPONENT: PARALLAX IMAGE ---
+// Scroll-reactive interlude: reveals an image by "unfurling" from right → left,
+// while the image itself parallax-shifts vertically as you scroll past.
 function UnfurlingImage() {
   const containerRef = useRef(null);
   const { scrollYProgress } = useScroll({
@@ -113,38 +122,34 @@ function UnfurlingImage() {
     offset: ["start end", "end start"],
   });
 
-  // Parallax: Image moves slightly slower than scroll
-  const y = useTransform(scrollYProgress, [0, 1], [-50, 50]);
+  const parallaxY = useTransform(scrollYProgress, [0, 1], [-50, 50]);
 
   return (
     <div
       ref={containerRef}
       className="relative w-full h-[60vh] md:h-[80vh] my-24 overflow-hidden"
     >
-      {/* Mask Container */}
       <motion.div
-        initial={{ clipPath: "inset(0 100% 0 0)" }} // Hidden (wiped right)
-        whileInView={{ clipPath: "inset(0 0% 0 0)" }} // Visible (unfurled)
+        // Reveal by animating clipPath from right to left.
+        initial={{ clipPath: "inset(0 100% 0 0)" }}
+        whileInView={{ clipPath: "inset(0 0% 0 0)" }}
         viewport={{ once: true, margin: "-10% 0px" }}
-        transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }} // Smooth ease
+        transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
         className="relative w-full h-full bg-roxy-beige"
       >
         <motion.div
-          style={{ y }}
+          style={{ y: parallaxY }}
           className="relative w-full h-[120%] -top-[10%]"
         >
-          {/* ⚠️ PLACE ASSET HERE: The "Red Bottle" Image */}
           <Image
             src="/assets/6.jpg"
             alt="Cosmetic production detail"
             fill
             className="object-cover"
           />
-          {/* Optional: Subtle grain or overlay */}
           <div className="absolute inset-0 bg-black/5" />
         </motion.div>
 
-        {/* Markers (from screenshot) */}
         <div className="absolute top-12 left-12 text-white/80 z-10">
           <Plus size={20} />
         </div>
@@ -156,9 +161,9 @@ function UnfurlingImage() {
   );
 }
 
-// --- MAIN COMPONENT ---
 export default function FAQSection() {
-  const [openId, setOpenId] = useState<string | null>("01"); // First one open by default
+  // Tracks the single expanded accordion item (or `null` for all collapsed).
+  const [openId, setOpenId] = useState<string | null>(faqs[0]?.id ?? null);
 
   const toggleFAQ = (id: string) => {
     setOpenId(openId === id ? null : id);
@@ -167,7 +172,7 @@ export default function FAQSection() {
   return (
     <section className="bg-roxy-white py-24 md:py-32">
       <Container>
-        {/* 1. Header */}
+        {/* Section header/copy. */}
         <div className="max-w-3xl mx-auto text-center mb-16 px-6">
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
@@ -192,11 +197,11 @@ export default function FAQSection() {
         </div>
       </Container>
 
-      {/* 2. Full Width Image (Unfurl Animation) */}
+      {/* Visual break between intro and accordion list. */}
       <UnfurlingImage />
 
       <Container>
-        {/* 3. The Questions List */}
+        {/* Accordion list. */}
         <div className="max-w-5xl mx-auto border-t border-roxy-graphite/20">
           {faqs.map((faq) => (
             <FAQItem

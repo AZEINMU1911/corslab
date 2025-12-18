@@ -3,13 +3,21 @@
 import { motion } from "framer-motion";
 import Image from "next/image";
 
+/**
+ * MainHeroSection (above-the-fold hero)
+ * - Full-viewport background image with dark overlay for legibility
+ * - Centered logo, headline, supporting copy, and a primary CTA button
+ *
+ * Common edits:
+ * - Background image: update `src="/assets/1.jpg"`
+ * - Headline/subcopy/CTA label: update the text nodes below
+ * - Animation: tweak the `motion.*` initial/animate/transition props
+ */
 export default function MainHero() {
   return (
     <section className="relative h-screen w-full flex items-center justify-center overflow-hidden">
-      {/* 1. Background Image */}
+      {/* Background layer: image + subtle dark overlay. */}
       <div className="absolute inset-0 w-full h-full">
-        {/* ⚠️ PLACE ASSET HERE: High-res Hero Image (Bottles/Setup) */}
-        {/* Replace src with your actual image path, e.g., "/assets/hero-bg.jpg" */}
         <Image
           src="/assets/1.jpg"
           alt="Cosmetic Lab Setup"
@@ -17,20 +25,17 @@ export default function MainHero() {
           className="object-cover"
           priority
         />
-        {/* Overlay to ensure text pops */}
         <div className="absolute inset-0 bg-black/20" />
       </div>
 
-      {/* 2. Content */}
+      {/* Foreground layer: stacked logo → headline → subcopy → CTA. */}
       <div className="relative z-10 flex flex-col items-center text-center px-6 max-w-4xl mx-auto space-y-8">
-        {/* Logo Icon */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
           className="relative w-24 h-24 md:w-32 md:h-32 mb-4"
         >
-          {/* ⚠️ Ensure this white logo exists in public folder */}
           <Image
             src="/CoslabWhite.png"
             alt="Roxy Coslab Logo"
@@ -39,7 +44,6 @@ export default function MainHero() {
           />
         </motion.div>
 
-        {/* Headline */}
         <motion.h1
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -50,7 +54,6 @@ export default function MainHero() {
           with a <span className="text-white">Trusted Lab</span>
         </motion.h1>
 
-        {/* Subheadline */}
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -60,7 +63,6 @@ export default function MainHero() {
           Roxy CosLab - Trusted OEM for Skincare & Bodycare.
         </motion.p>
 
-        {/* CTA Button */}
         <motion.button
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}

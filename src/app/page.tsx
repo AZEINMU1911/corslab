@@ -7,6 +7,7 @@ import WaveSection from "@/components/sections/WaveSection";
 import ShowcaseSection from "@/components/sections/ShowcaseSection";
 import ProcessSection from "@/components/sections/ProcessSection";
 import FAQSection from "@/components/sections/FAQSection";
+import CertificationSection from "@/components/sections/CertificationSection";
 
 export default function Home() {
   return (
@@ -17,9 +18,10 @@ export default function Home() {
       <ProductBillboard />
       <VisionMission />
       <WaveSection />
+      <ShowcaseSection />
       <ProcessSection />
       <FAQSection />
-      <ShowcaseSection />
+      <CertificationSection />
     </main>
   );
 }

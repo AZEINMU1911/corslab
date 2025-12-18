@@ -5,13 +5,24 @@ import { motion, useSpring, useInView, useMotionValue } from "framer-motion";
 import { useEffect, useRef } from "react";
 import type { StatItem } from "@/types";
 
+/**
+ * StatsSection
+ * - Grid of key numbers with a count-up animation when each value scrolls into view.
+ *
+ * Common edits:
+ * - Stat content: update the `stats` array
+ * - Count-up feel: tweak the `useSpring` config in `Counter`
+ */
 const stats: StatItem[] = [
-  { value: "9999", label: "YEARS" },
-  { value: "9999", label: "PROJECTS" },
-  { value: "80000", label: "AWARDS" },
-  { value: "1", label: "CLIENTS" },
+  { value: "20", label: "YEARS" },
+  { value: "100", label: "PROJECTS" },
+  { value: "67", label: "AWARDS" },
+  { value: "42", label: "CLIENTS" },
 ];
 
+// Animated numeric display:
+// - Starts at 0, springs to the target number when the span enters the viewport.
+// - Writes the rounded value into the DOM to avoid re-rendering on every frame.
 function Counter({ value }: { value: string }) {
   const ref = useRef<HTMLSpanElement>(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
@@ -47,7 +58,6 @@ export default function StatsSection() {
             >
               <div className="text-6xl md:text-7xl font-semibold tracking-tight text-roxy-black mb-2 flex items-baseline">
                 <Counter value={stat.value} />
-                {/* Dot only appears on hover */}
                 <motion.div
                   initial={{ scale: 0 }}
                   whileInView={{ scale: 1 }}
