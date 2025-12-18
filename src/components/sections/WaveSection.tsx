@@ -20,6 +20,7 @@ import Image from "next/image";
 export default function WaveSection() {
   const containerRef = useRef<HTMLDivElement>(null);
 
+  // Scroll progress is scoped to this section's container.
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ["start end", "end start"],
@@ -56,6 +57,7 @@ export default function WaveSection() {
 
           {/* Foreground layer: centered logo (early) then headline (later). */}
           <div className="absolute inset-0 flex flex-col justify-center px-6 md:px-24 z-10">
+            {/* Logo phase */}
             <motion.div
               style={{ opacity: logoOpacity }}
               className="absolute inset-0 flex items-center justify-center pointer-events-none"
@@ -71,6 +73,7 @@ export default function WaveSection() {
               </div>
             </motion.div>
 
+            {/* Headline phase */}
             <motion.div
               style={{ opacity: headlineOpacity, y: headlineY }}
               className="max-w-6xl text-left"

@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { Plus } from "lucide-react";
+import StatsSection from "./StatsSection";
 
 /**
  * HeroSection (secondary hero statement)
@@ -52,8 +53,10 @@ export default function HeroSection() {
           with{" "}
           <span className="font-medium text-roxy-black">Practical Luxury</span>.
           The premier OEM partner for skincare and bodycare brands.
-          </motion.p>
+        </motion.p>
       </div>
+      {/* Using stats section inside HeroSection */}
+      <StatsSection />
     </section>
   );
 }

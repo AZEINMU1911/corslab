@@ -1,3 +1,4 @@
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@100..900&family=Roboto+Mono:wght@100..700&display=swap");
 @import "tailwindcss";
 
 @theme {
@@ -9,6 +10,8 @@
   --color-roxy-white: #ffffff;
 
   /* Font tokens */
+  --font-montserrat: "Montserrat";
+  --font-roboto-mono: "Roboto Mono";
   --font-sans: var(--font-montserrat), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-roboto-mono), ui-monospace, SFMono-Regular, monospace;
 }

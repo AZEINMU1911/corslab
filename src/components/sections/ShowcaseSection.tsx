@@ -14,6 +14,11 @@ import type { Product } from "@/types";
  * - Card content: update the `products` array (id/title/subtitle/imgUrl)
  * - Motion: tweak the `useScroll` offsets + `useTransform` ranges in `ProductCard`
  */
+
+// -----------------------------------------------------------------------------
+// Content data
+// -----------------------------------------------------------------------------
+
 const products: Product[] = [
   {
     id: "01",
@@ -40,6 +45,10 @@ const products: Product[] = [
     imgUrl: "/assets/5.jpg",
   },
 ];
+
+// -----------------------------------------------------------------------------
+// Subcomponents
+// -----------------------------------------------------------------------------
 
 // Single sticky panel. The card's scroll progress is scoped to itself so the
 // text animation repeats per-card while the image stays full-bleed.
@@ -96,6 +105,10 @@ function ProductCard({ product, index }: { product: Product; index: number }) {
     </div>
   );
 }
+
+// -----------------------------------------------------------------------------
+// Main component
+// -----------------------------------------------------------------------------
 
 export default function ShowcaseSection() {
   return (

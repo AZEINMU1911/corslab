@@ -30,6 +30,7 @@ export default function MainHero() {
 
       {/* Foreground layer: stacked logo → headline → subcopy → CTA. */}
       <div className="relative z-10 flex flex-col items-center text-center px-6 max-w-4xl mx-auto space-y-8">
+        {/* Logo */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -44,6 +45,7 @@ export default function MainHero() {
           />
         </motion.div>
 
+        {/* Headline */}
         <motion.h1
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -54,6 +56,7 @@ export default function MainHero() {
           with a <span className="text-white">Trusted Lab</span>
         </motion.h1>
 
+        {/* Supporting copy */}
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -63,6 +66,7 @@ export default function MainHero() {
           Roxy CosLab - Trusted OEM for Skincare & Bodycare.
         </motion.p>
 
+        {/* Primary CTA */}
         <motion.button
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}

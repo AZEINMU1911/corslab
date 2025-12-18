@@ -15,6 +15,11 @@ import Image from "next/image";
  * - Speed: tweak `transition.duration`
  * - Spacing: tweak the `gap-*` and `px-*` classes on the track wrapper
  */
+
+// -----------------------------------------------------------------------------
+// Content data
+// -----------------------------------------------------------------------------
+
 const certificationLogos = [
   { id: "iso", src: "/assets/iso.png", alt: "ISO Certified" },
   { id: "gmp", src: "/assets/gmp.png", alt: "GMP Quality" },

@@ -14,6 +14,7 @@ import Image from "next/image";
  * - Parallax strength: tweak the `imageY` range below
  */
 export default function ProductBillboard() {
+  // Local ref so the parallax progress is scoped to this section only.
   const containerRef = useRef(null);
   const { scrollYProgress } = useScroll({
     target: containerRef,
@@ -42,6 +43,7 @@ export default function ProductBillboard() {
         <div className="absolute inset-0 bg-black/10" />
       </motion.div>
 
+      {/* Decorative corner marks */}
       <div className="absolute top-12 left-12 text-white/80">
         <svg
           width="24"

@@ -11,6 +11,11 @@ import { Container } from "@/components/ui/Container";
  * - Steps copy/order: update the `steps` array
  * - Animation: tweak `itemVariants` or the `viewport` margin per row
  */
+
+// -----------------------------------------------------------------------------
+// Content data
+// -----------------------------------------------------------------------------
+
 const steps = [
   {
     id: "01",
@@ -37,6 +42,10 @@ const steps = [
       "Full assistance with regulatory compliance (BPOM), packaging design, and marketing guidelines for launch.",
   },
 ];
+
+// -----------------------------------------------------------------------------
+// Animation presets
+// -----------------------------------------------------------------------------
 
 // Reusable Framer Motion variants applied to each row in the steps list.
 const itemVariants: Variants = {

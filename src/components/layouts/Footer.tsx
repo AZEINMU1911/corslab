@@ -1,5 +1,6 @@
 import { Container } from "@/components/ui/Container";
 import Link from "next/link";
+import Image from "next/image"; // 1. Import Image component
 
 export default function Footer() {
   return (
@@ -7,9 +8,18 @@ export default function Footer() {
       <Container>
         <div className="grid grid-cols-1 md:grid-cols-12 gap-12 md:gap-8 mb-24">
           <div className="md:col-span-5 space-y-8">
-            <h2 className="text-2xl font-medium tracking-tight">
-              ROXY COSLAB.
-            </h2>
+            {/* 2. Replaced the <h2> text with Image */}
+            <Link href="/" className="block w-fit">
+              <Image
+                src="/CoslabFull.png"
+                alt="Roxy Coslab"
+                width={200} // Adjust width as needed
+                height={60} // Adjust height to match aspect ratio
+                className="object-contain"
+                priority // Loads it immediately since it's above the fold (sometimes) or important branding
+              />
+            </Link>
+
             <p className="text-roxy-graphite text-lg font-light max-w-sm">
               Manufacturing excellence where global standards meet your unique
               brand vision.

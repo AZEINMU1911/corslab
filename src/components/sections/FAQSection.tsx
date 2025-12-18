@@ -22,6 +22,11 @@ import type { FAQItemData } from "@/types";
  * - Interlude image: update `src="/assets/6.jpg"` inside `UnfurlingImage`
  * - Accordion motion: tweak the `AnimatePresence` transitions in `FAQItem`
  */
+
+// -----------------------------------------------------------------------------
+// Content data
+// -----------------------------------------------------------------------------
+
 const faqs: FAQItemData[] = [
   {
     id: "01",
@@ -48,6 +53,10 @@ const faqs: FAQItemData[] = [
       "Yes, we handle the entire BPOM notification process for you. Our regulatory team ensures your products meet all Indonesian cosmetic safety standards before launch.",
   },
 ];
+
+// -----------------------------------------------------------------------------
+// Subcomponents
+// -----------------------------------------------------------------------------
 
 // Single accordion row: question button + animated expand/collapse answer panel.
 function FAQItem({

@@ -21,7 +21,7 @@ The home page is a stack of “sections” (hero, stats, billboard, FAQ, etc.) c
 - Install dependencies: `npm install`
 - Start dev server: `npm run dev`
 - Lint: `npm run lint`
-- Production build: `npm run build`
+- Production build: `npm run build` (configured to use Webpack via `--webpack`)
 - Start production server: `npm run start`
 
 ## Project Structure
@@ -49,9 +49,16 @@ The section order is defined in `src/app/page.tsx`:
 - `ProcessSection` — 4-step process list with per-item in-view animation
 - `FAQSection` — Accordion + unfurling parallax image reveal
 - `CertificationSection` — Infinite-loop certification carousel
+- `ContactSection` — Validated contact form with ReCAPTCHA + success modal
 
 ## Section Maintenance Guide (Quick Edits)
 All section components live in `src/components/sections/` and most are client components (`"use client"`) because they use Framer Motion hooks.
+
+### How Section Files Are Organized
+Most section files follow the same internal structure (mirrors the labels you’ll see in code comments):
+- **Content data** — hardcoded arrays used to render lists (`products`, `steps`, `faqs`, etc.)
+- **Subcomponents** — helper components used only by that section (`ProductCard`, `FAQItem`, `Counter`, etc.)
+- **Main component** — the exported section component rendered by `src/app/page.tsx`
 
 ### Where to Change What
 - `src/components/sections/MainHeroSection.tsx` — Background image (`/assets/1.jpg`), logo (`/CoslabWhite.png`), hero headline/subcopy, CTA button label.
@@ -64,11 +71,20 @@ All section components live in `src/components/sections/` and most are client co
 - `src/components/sections/ProcessSection.tsx` — Update the `steps` array; animation tuning is in `itemVariants` + per-row `viewport` settings.
 - `src/components/sections/FAQSection.tsx` — Update the `faqs` array; the image interlude is `UnfurlingImage` (`/assets/6.jpg`); accordion expand/collapse animation is in `FAQItem`.
 - `src/components/sections/CertificationSection.tsx` — Update `certificationLogos` (ensure assets exist under `public/assets/`); marquee speed is `transition.duration`.
+- `src/components/sections/ContactSection.tsx` — Replace `BACKGROUND_IMAGE_URL`, update the ReCAPTCHA `sitekey`, and replace the simulated submission inside `handleSubmit`.
 
 ### Common Patterns Used in Sections
 - **In-view reveals:** `whileInView` + `viewport={{ once: true }}` for one-time entrance animations.
 - **Scroll progress animations:** `useScroll({ target, offset })` + `useTransform(scrollYProgress, ...)` to map scroll progress to CSS transforms/opacity.
 - **Sticky scroll storytelling:** a tall container (e.g. `h-[250vh]`) + a sticky child (`sticky top-0 h-screen`) to create a pinned stage.
+
+## Contact Form Notes
+`ContactSection` is currently client-only and simulates an API call on submit.
+
+Recommended production wiring:
+1. Create an API route (e.g. `src/app/api/contact/route.ts`) to receive form data.
+2. Verify the ReCAPTCHA token server-side before accepting the request.
+3. Send the message (email/CRM) and return success/failure to drive the modal + error UI.
 
 ## Styling & Design Tokens
 Brand tokens live in `src/app/globals.css` under `@theme`:
@@ -76,6 +92,9 @@ Brand tokens live in `src/app/globals.css` under `@theme`:
 - Fonts: `--font-sans`, `--font-mono`
 
 Most components use utility classes directly; layout spacing is typically handled with `Container`.
+
+### Fonts
+Fonts are loaded via a Google Fonts CSS `@import` in `src/app/globals.css`. This avoids build-time font fetching (useful for restricted build environments), but does require network access in the browser to download fonts unless you switch to locally hosted fonts.
 
 ## Assets
 Assets are referenced by absolute paths (served from `public/`), for example:
