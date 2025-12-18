@@ -2,15 +2,21 @@
 
 import { motion } from "framer-motion";
 import { Plus } from "lucide-react";
+import StatsSection from "./StatsSection";
 
+/**
+ * HeroSection (secondary hero statement)
+ * - Large typographic headline + short supporting paragraph
+ * - Decorative "plus" icon in the corner (brand motif used elsewhere)
+ *
+ * Common edits:
+ * - Copy: update the `<motion.h1>` and `<motion.p>` text
+ * - Motion: tweak the `transition` props for intro timing
+ */
 export default function HeroSection() {
   return (
     <section className="relative h-screen w-full flex flex-col justify-center items-center px-6 overflow-hidden">
-      {/* ⚠️ PLACE ASSET HERE: Optional Hero Background
-          If the design requires a photo, place an absolute <Image /> or <video> here with z-0.
-          Current: bg-roxy-white (Clean Style)
-      */}
-
+      {/* Decorative corner icon. */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -20,6 +26,7 @@ export default function HeroSection() {
         <Plus size={24} strokeWidth={1.5} />
       </motion.div>
 
+      {/* Centered headline + supporting paragraph. */}
       <div className="max-w-5xl mx-auto text-center z-10">
         <motion.h1
           initial={{ opacity: 0, y: 30 }}
@@ -48,13 +55,8 @@ export default function HeroSection() {
           The premier OEM partner for skincare and bodycare brands.
         </motion.p>
       </div>
-
-      <motion.div
-        initial={{ scale: 0 }}
-        animate={{ scale: 1 }}
-        transition={{ delay: 0.6, type: "spring" }}
-        className="absolute bottom-1/4 right-1/4 w-4 h-4 bg-roxy-black rounded-full"
-      />
+      {/* Using stats section inside HeroSection */}
+      <StatsSection />
     </section>
   );
 }

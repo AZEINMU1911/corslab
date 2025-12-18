@@ -4,40 +4,46 @@ import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef } from "react";
 import Image from "next/image";
 
+/**
+ * ProductBillboard
+ * - Full-width image billboard with subtle vertical parallax on scroll.
+ * - Decorative corner "plus" marks are inline SVGs (no icon dependency).
+ *
+ * Common edits:
+ * - Billboard image: update `src="/assets/4.jpg"`
+ * - Parallax strength: tweak the `imageY` range below
+ */
 export default function ProductBillboard() {
+  // Local ref so the parallax progress is scoped to this section only.
   const containerRef = useRef(null);
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ["start end", "end start"],
   });
 
-  // Parallax: The image moves slower than the scroll, creating depth
-  const y = useTransform(scrollYProgress, [0, 1], [-100, 100]);
+  // Moves the image slower than the page scroll to create depth.
+  const imageY = useTransform(scrollYProgress, [0, 1], [-100, 100]);
 
   return (
     <section
       ref={containerRef}
       className="relative w-full h-[80vh] overflow-hidden bg-roxy-white"
     >
-      {/* The Parallax Image Container */}
+      {/* Parallax image layer. */}
       <motion.div
-        style={{ y }}
+        style={{ y: imageY }}
         className="absolute inset-0 w-full h-[120%] -top-[10%]"
       >
-        {/* ⚠️ PLACE ASSET HERE: The "Billboard" Image 
-            Use a high-quality landscape photo of a product setup.
-        */}
         <Image
           src="/assets/4.jpg"
           alt="Cosmetic Billboard"
           fill
           className="object-cover"
         />
-        {/* Dark overlay for "Cinematic" feel */}
         <div className="absolute inset-0 bg-black/10" />
       </motion.div>
 
-      {/* Optional Markers (The '+' icons seen in screenshots) */}
+      {/* Decorative corner marks */}
       <div className="absolute top-12 left-12 text-white/80">
         <svg
           width="24"

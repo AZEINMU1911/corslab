@@ -4,41 +4,46 @@ import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef } from "react";
 import Image from "next/image";
 
+/**
+ * WaveSection
+ * - Creates a long scroll region (`h-[250vh]`) with a sticky full-viewport stage.
+ * - Uses `scrollYProgress` to choreograph a simple sequence:
+ *   1) Zoom/round → full-bleed video container
+ *   2) Fade logo out
+ *   3) Slide/fade headline in
+ *
+ * Common edits:
+ * - Video: update `src="/assets/wave.mp4"`
+ * - Copy: update the `<h2>` headline text
+ * - Timing: tweak the `useTransform` ranges below
+ */
 export default function WaveSection() {
   const containerRef = useRef<HTMLDivElement>(null);
 
+  // Scroll progress is scoped to this section's container.
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ["start end", "end start"],
   });
 
-  // 1. CONTAINER SCALE: Expands to full width early (by 30%)
-  const scale = useTransform(scrollYProgress, [0, 0.3], [0.8, 1]);
-  const borderRadius = useTransform(scrollYProgress, [0, 0.3], [40, 0]);
+  // Container "intro" — scale up and remove rounded corners as the section enters.
+  const containerScale = useTransform(scrollYProgress, [0, 0.3], [0.8, 1]);
+  const containerRadius = useTransform(scrollYProgress, [0, 0.3], [40, 0]);
 
-  // 2. LOGO SEQUENCE:
-  // Visible at start, fades OUT completely between 30% and 40%
+  // Logo → headline transition — logo fades out, headline fades/slides in.
   const logoOpacity = useTransform(scrollYProgress, [0.3, 0.4], [1, 0]);
-
-  // 3. TEXT SEQUENCE ("Movie Credits" Style):
-  // Starts invisible/low. Rises UP from the bottom.
-  // Starts moving at 45% (after logo is gone), lands at 70%.
-  // Stays locked in place from 70% to 100% so you can read it.
-
-  // Opacity: Quick fade in so it doesn't "pop"
-  const textOpacity = useTransform(scrollYProgress, [0.4, 0.5], [0, 1]);
-
-  // Vertical Movement: Starts 150px down, slides UP to 0px
-  const textY = useTransform(scrollYProgress, [0.4, 0.7], [150, 0]);
+  const headlineOpacity = useTransform(scrollYProgress, [0.4, 0.5], [0, 1]);
+  const headlineY = useTransform(scrollYProgress, [0.4, 0.7], [150, 0]);
 
   return (
     <div ref={containerRef} className="relative h-[250vh] bg-roxy-white">
+      {/* Sticky stage that stays fixed while the scroll progress animates the content. */}
       <div className="sticky top-0 h-screen flex items-center justify-center overflow-hidden">
         <motion.div
-          style={{ scale, borderRadius }}
+          style={{ scale: containerScale, borderRadius: containerRadius }}
           className="relative w-full h-full max-h-screen bg-roxy-black overflow-hidden shadow-2xl"
         >
-          {/* VIDEO BACKGROUND */}
+          {/* Background layer: looping video + vignette-style radial overlay. */}
           <video
             autoPlay
             loop
@@ -50,11 +55,9 @@ export default function WaveSection() {
 
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,#000000_100%)] opacity-60" />
 
-          {/* CONTENT CONTAINER */}
-          {/* Aligned to the LEFT (items-start) */}
+          {/* Foreground layer: centered logo (early) then headline (later). */}
           <div className="absolute inset-0 flex flex-col justify-center px-6 md:px-24 z-10">
-            {/* A. LOGO (Centered Absolutely) */}
-            {/* Kept separate so it doesn't mess up the text alignment */}
+            {/* Logo phase */}
             <motion.div
               style={{ opacity: logoOpacity }}
               className="absolute inset-0 flex items-center justify-center pointer-events-none"
@@ -70,9 +73,9 @@ export default function WaveSection() {
               </div>
             </motion.div>
 
-            {/* B. TEXT (Left Aligned & Sliding Up) */}
+            {/* Headline phase */}
             <motion.div
-              style={{ opacity: textOpacity, y: textY }}
+              style={{ opacity: headlineOpacity, y: headlineY }}
               className="max-w-6xl text-left"
             >
               <h2 className="text-4xl md:text-6xl lg:text-8xl font-medium text-white leading-[1.05] tracking-tight">

@@ -1,19 +1,21 @@
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@100..900&family=Roboto+Mono:wght@100..700&display=swap");
 @import "tailwindcss";
 
 @theme {
-  /* Define Brand Colors from Roxy Coslab PDF */
+  /* Brand colors */
   --color-roxy-graphite: #8a8d92;
   --color-roxy-black: #1e1e1e;
   --color-roxy-beige: #e8dccf;
   --color-roxy-mint: #d9efe7;
   --color-roxy-white: #ffffff;
 
-  /* Define Fonts (Linked to layout.tsx variables) */
+  /* Font tokens */
+  --font-montserrat: "Montserrat";
+  --font-roboto-mono: "Roboto Mono";
   --font-sans: var(--font-montserrat), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-roboto-mono), ui-monospace, SFMono-Regular, monospace;
 }
 
-/* Base Styles */
 body {
   background-color: var(--color-roxy-white);
   color: var(--color-roxy-black);

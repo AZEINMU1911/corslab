@@ -10,7 +10,6 @@ export default function Navbar() {
   const { scrollY } = useScroll();
   const [isScrolled, setIsScrolled] = useState(false);
 
-  // Detect scroll to toggle the background style
   useMotionValueEvent(scrollY, "change", (latest) => {
     setIsScrolled(latest > 50);
   });
@@ -24,16 +23,9 @@ export default function Navbar() {
       }`}
     >
       <Container className="flex items-center justify-between h-20 md:h-24">
-        {/* Logo */}
         <Link href="/" className="relative w-10 h-10 md:w-12 md:h-12">
-          {/* We use the logo icon. 
-               Note: If you have a dark version for the white background, swap it here. 
-               For now, we assume the logo is visible or you use a mix-blend-mode.
-           */}
           <Image
-            src="/CoslabWhite.png" // If this is white, it might be hard to see on white bg sections
-            // PRO TIP: Use a CSS filter to invert it on white backgrounds if needed,
-            // or swap the src based on 'isScrolled'
+            src="/CoslabWhite.png"
             className={`object-contain transition-all duration-300 ${
               isScrolled ? "invert filter" : ""
             }`}
@@ -42,7 +34,6 @@ export default function Navbar() {
           />
         </Link>
 
-        {/* Navigation Links (Desktop) */}
         <nav className="hidden md:flex items-center gap-8">
           {["Services", "Process", "FAQ", "Contact"].map((item) => (
             <Link
@@ -59,7 +50,6 @@ export default function Navbar() {
           ))}
         </nav>
 
-        {/* CTA Button */}
         <button
           className={`px-6 py-2 rounded-sm text-xs font-bold uppercase tracking-widest border transition-colors ${
             isScrolled
