@@ -2,72 +2,69 @@
 
 import { motion, type Variants } from "framer-motion";
 import { Container } from "@/components/ui/Container";
+import type { ProcessStep } from "@/types";
 
 /**
- * ProcessSection
- * - Simple 4-step process list with per-row in-view reveal animation.
+ * This section is a Client Component (`"use client"`) even though it receives
+ * data from the server.
  *
- * Common edits:
- * - Steps copy/order: update the `steps` array
- * - Animation: tweak `itemVariants` or the `viewport` margin per row
+ * Why it must be client-side:
+ * - Framer Motion performs animations in the browser (it needs the DOM).
+ * - Next.js requires components using client-only libraries to opt into client
+ *   rendering via `"use client"`.
+ *
+ * Data flow (important mental model):
+ * - `src/app/page.tsx` (Server Component) fetches CMS data from Strapi.
+ * - It passes just the needed slice (`ProcessSection`) into this component.
+ * - This component focuses on UI + animation, not networking.
  */
 
-// -----------------------------------------------------------------------------
-// Content data
-// -----------------------------------------------------------------------------
+/**
+ * The minimal shape of a single "process step" we expect from Strapi.
+ *
+ * Why we type it:
+ * - It documents the contract between Strapi and the frontend.
+ * - It helps catch mismatches early (e.g. Strapi field renamed).
+ */
 
-const steps = [
-  {
-    id: "01",
-    title: "CONSULTATION",
-    description:
-      "In-depth discussion regarding your product concept, categories, quantity targets, and budget alignment.",
-  },
-  {
-    id: "02",
-    title: "SAMPLING",
-    description:
-      "Explore our ready-to-use formulations or develop a custom formula tailored to your specific vision.",
-  },
-  {
-    id: "03",
-    title: "PRODUCTION",
-    description:
-      "High-quality manufacturing process with an estimated efficient turnaround time of 30 to 60 working days.",
-  },
-  {
-    id: "04",
-    title: "LAUNCH SUPPORT",
-    description:
-      "Full assistance with regulatory compliance (BPOM), packaging design, and marketing guidelines for launch.",
-  },
-];
+/**
+ * Props for `ProcessSection`.
+ *
+ * Why `data` is optional:
+ * - When the page is first being wired up, Strapi may not have content yet.
+ * - Network issues can cause the fetcher to return `null`.
+ * - Making it optional lets the UI fail gracefully instead of throwing.
+ */
+interface ProcessSectionProps {
+  data?: {
+    Process: ProcessStep[];
+  };
+}
 
-// -----------------------------------------------------------------------------
-// Animation presets
-// -----------------------------------------------------------------------------
-
-// Reusable Framer Motion variants applied to each row in the steps list.
+// Animation Settings
 const itemVariants: Variants = {
-  hidden: {
-    opacity: 0,
-    y: 30,
-  },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: {
-      duration: 0.6,
-      ease: "easeOut",
-    },
-  },
+  hidden: { opacity: 0, y: 30 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
 };
 
-export default function ProcessSection() {
+export default function ProcessSection({ data }: ProcessSectionProps) {
+  /**
+   * Fallback strategy:
+   * - If Strapi returned steps, render them.
+   * - If not, render an empty list (so the section still mounts, but shows `0`).
+   *
+   * Why we don't hardcode fallback steps here:
+   * - Hardcoded steps are great for prototyping, but they can drift from the CMS
+   *   and confuse content editors ("I changed Strapi but the site didn't change").
+   * - If you want a design-time placeholder, consider showing a skeleton UI or a
+   *   short "Content coming soon" message instead of fake content.
+   */
+  const steps = data?.Process || [];
+
   return (
     <section className="bg-roxy-white py-24">
       <Container>
-        {/* Section title and step count. */}
+        {/* Header */}
         <div className="mb-16 flex items-baseline gap-4">
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
@@ -78,11 +75,11 @@ export default function ProcessSection() {
             Fast, Simple, Transparent
           </motion.h2>
           <span className="text-xl font-mono text-roxy-graphite opacity-50">
-            / 4
+            / {steps.length}
           </span>
         </div>
 
-        {/* Steps list (each row animates into view once). */}
+        {/* Dynamic list driven by CMS data (Strapi). */}
         <div className="flex flex-col border-t border-roxy-graphite/20">
           {steps.map((step) => (
             <motion.div
@@ -93,18 +90,21 @@ export default function ProcessSection() {
               viewport={{ once: true, margin: "-50px" }}
               className="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-12 py-8 border-b border-roxy-graphite/20 group cursor-default"
             >
+              {/* Column 1: Number & Title */}
               <div className="md:col-span-4 flex items-baseline gap-6">
                 <span className="font-mono text-sm text-roxy-black font-bold tracking-widest">
-                  {step.id}
+                  {/* Ensures single digits get a zero (e.g. "1" -> "01") */}
+                  {String(step.Step).padStart(2, "0")}
                 </span>
                 <h3 className="text-lg font-bold tracking-widest text-roxy-black uppercase group-hover:text-roxy-graphite transition-colors">
-                  {step.title}
+                  {step.Title}
                 </h3>
               </div>
 
+              {/* Column 2: Description */}
               <div className="md:col-span-8">
                 <p className="text-xl md:text-2xl font-light text-roxy-black leading-relaxed opacity-90">
-                  {step.description}
+                  {step.Description}
                 </p>
               </div>
             </motion.div>
