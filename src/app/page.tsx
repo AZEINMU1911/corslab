@@ -1,4 +1,4 @@
-import { fetchAPI } from "@/lib/api"; // 👈 Import the fetcher
+import { fetchAPI } from "@/lib/api";
 import MainHero from "@/components/sections/MainHeroSection";
 import HeroSection from "@/components/sections/HeroSection";
 import ProductBillboard from "@/components/sections/ProductBillboard";
@@ -31,7 +31,7 @@ import ContactSection from "@/components/sections/ContactSection";
 /**
  * Fetch the CMS data needed to render the homepage.
  *
- * Deep-populate strategy (Strapi v5):
+ * Deep-populate (Strapi v5):
  * - Strapi will not automatically include nested components, relations, or media.
  * - `populate=*` is often only 1-level deep; nested components can still come back
  *   "closed" (present, but missing their internal fields).
@@ -41,10 +41,10 @@ import ContactSection from "@/components/sections/ContactSection";
  */
 async function getHomePageData() {
   const query =
-    "populate[HeroSection][populate][Main][populate]=*&" + // 👈 DIG DEEPER for Images
-    "populate[HeroSection][populate][MaklonButton][populate]=*&" + // 👈 DIG DEEPER for Button
+    "populate[HeroSection][populate][Main][populate]=*&" +
+    "populate[HeroSection][populate][MaklonButton][populate]=*&" +
     "populate[AboutSection][populate]=*&" +
-    "populate[ShowcaseSection][populate]=*&" +
+    "populate[ShowcaseSection][populate][Product][populate]=*&" +
     "populate[ProcessSection][populate]=*&" +
     "populate[FAQSection][populate]=*";
 
@@ -61,23 +61,21 @@ export default async function Home() {
   // 3. Fetch the data
   const strapiData = await getHomePageData();
 
-  // Debug: Check your VS Code terminal to see if it says "Yes"
+  // Debug
   console.log("🔥 Strapi Data Received:", strapiData ? "Yes" : "No");
 
   return (
     <main className="min-h-screen flex flex-col w-full">
       <MainHero data={strapiData?.HeroSection} />
-      {/* Shared CMS source: `HeroSection` consumes `strapiData.AboutSection` (a single Strapi "master container"). */}
+      {/* Shared CMS source */}
       <HeroSection data={strapiData?.AboutSection} />
-      {/* Shared CMS source: `ProductBillboard` consumes `strapiData.AboutSection` (a single Strapi "master container"). */}
       <ProductBillboard data={strapiData?.AboutSection} />
-      {/* Shared CMS source: `VisionMission` consumes `strapiData.AboutSection` (a single Strapi "master container"). */}
       <VisionMission data={strapiData?.AboutSection} />
+      {/* Shared CMS source */}
       <WaveSection />
-      <ShowcaseSection />
-      {/* 👇 4. Pass the data here */}
+      <ShowcaseSection data={strapiData?.ShowcaseSection} />
       <ProcessSection data={strapiData?.ProcessSection} />
-      <FAQSection />
+      <FAQSection data={strapiData?.FAQSection} />
       <CertificationSection />
       <ContactSection />
     </main>

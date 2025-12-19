@@ -64,12 +64,23 @@ export interface Product {
   id: number;
   Name: string; // Strapi sends "Name"
   Description: string; // Strapi sends "Description"
-  // Add image here later if your content type has one
+  Image: StrapiImage; // Strapi sends "Image"
+}
+
+export interface ShowcaseData {
+  Product: Product[];
 }
 
 // 5. FAQ
 export interface FAQItemData {
   id: number;
-  Question: string; // Strapi sends "Question"
-  Answer: string; // Strapi sends "Answer"
+  Question: string; // 👈 Capitalized (Strapi)
+  Answer: string; // 👈 Capitalized (Strapi)
+}
+
+export interface FAQSectionData {
+  SectionTitle: string;
+  SupportingText: string;
+  Questions: FAQItemData[];
+  ProductShowcase: StrapiImage; // 👈 The "Unfurling Image"
 }

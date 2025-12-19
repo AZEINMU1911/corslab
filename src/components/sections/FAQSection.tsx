@@ -10,80 +10,91 @@ import {
 import { Container } from "@/components/ui/Container";
 import Image from "next/image";
 import { Plus, Minus } from "lucide-react";
-import type { FAQItemData } from "@/types";
-
-/**
- * FAQSection
- * - Accordion list (single-open item) driven by local state (`openId`)
- * - Includes an "UnfurlingImage" interlude: clipPath reveal + subtle parallax
- *
- * Common edits:
- * - FAQ content: update the `faqs` array
- * - Interlude image: update `src="/assets/6.jpg"` inside `UnfurlingImage`
- * - Accordion motion: tweak the `AnimatePresence` transitions in `FAQItem`
- */
-
-// -----------------------------------------------------------------------------
-// Content data
-// -----------------------------------------------------------------------------
-
-const faqs: FAQItemData[] = [
-  {
-    id: "01",
-    question: "What is the Minimum Order Quantity (MOQ)?",
-    answer:
-      "Our standard MOQ starts at 1,500 pieces per SKU. However, ordering in larger quantities allows us to offer a more competitive price per unit (economies of scale).",
-  },
-  {
-    id: "02",
-    question: "Can I create a custom formula?",
-    answer:
-      "Absolutely. Our R&D team specializes in custom formulations. We can modify existing bases or create entirely new products to match your specific benchmark and vision.",
-  },
-  {
-    id: "03",
-    question: "How long does the manufacturing process take?",
-    answer:
-      "Typically, the timeline is 30-60 working days after sample approval and down payment. This includes material sourcing, production, quality control, and filling.",
-  },
-  {
-    id: "04",
-    question: "Do you assist with BPOM registration?",
-    answer:
-      "Yes, we handle the entire BPOM notification process for you. Our regulatory team ensures your products meet all Indonesian cosmetic safety standards before launch.",
-  },
-];
+import { getStrapiMedia } from "@/lib/media";
+import type { FAQSectionData, FAQItemData } from "@/types";
 
 // -----------------------------------------------------------------------------
 // Subcomponents
 // -----------------------------------------------------------------------------
 
-// Single accordion row: question button + animated expand/collapse answer panel.
+// 1. UPDATED: Accepts 'imgUrl' prop now
+function UnfurlingImage({ imgUrl }: { imgUrl: string }) {
+  const containerRef = useRef(null);
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start end", "end start"],
+  });
+
+  const parallaxY = useTransform(scrollYProgress, [0, 1], [-50, 50]);
+
+  return (
+    <div
+      ref={containerRef}
+      className="relative w-full h-[60vh] md:h-[80vh] my-24 overflow-hidden"
+    >
+      <motion.div
+        initial={{ clipPath: "inset(0 100% 0 0)" }}
+        whileInView={{ clipPath: "inset(0 0% 0 0)" }}
+        viewport={{ once: true, margin: "-10% 0px" }}
+        transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
+        className="relative w-full h-full bg-[#EAE4DC]"
+      >
+        <motion.div
+          style={{ y: parallaxY }}
+          className="relative w-full h-[120%] -top-[10%]"
+        >
+          {/* Dynamic Image from Strapi */}
+          <Image
+            src={imgUrl}
+            alt="Cosmetic production detail"
+            fill
+            className="object-cover"
+            unoptimized
+          />
+          <div className="absolute inset-0 bg-black/5" />
+        </motion.div>
+
+        <div className="absolute top-12 left-12 text-white/80 z-10">
+          <Plus size={20} />
+        </div>
+        <div className="absolute bottom-12 right-12 text-white/80 z-10">
+          <Plus size={20} />
+        </div>
+      </motion.div>
+    </div>
+  );
+}
+
+// 2. UPDATED: Reads Capitalized Keys (Question, Answer)
 function FAQItem({
   item,
+  index,
   isOpen,
   onClick,
 }: {
   item: FAQItemData;
+  index: number;
   isOpen: boolean;
   onClick: () => void;
 }) {
+  const displayId = String(index + 1).padStart(2, "0");
   return (
-    <div className="border-b border-roxy-graphite/20 last:border-none">
+    <div className="border-b border-[#1E1E1E]/20 last:border-none">
       <button
         onClick={onClick}
         className="w-full py-8 flex items-start justify-between text-left group"
       >
         <div className="flex items-baseline gap-6 md:gap-12">
-          <span className="font-mono text-sm text-roxy-graphite/60 font-bold tracking-widest min-w-[30px]">
-            / {item.id}
+          <span className="font-mono text-sm text-[#1E1E1E]/60 font-bold tracking-widest min-w-[30px]">
+            / {displayId}
           </span>
-          <h3 className="text-xl md:text-2xl font-medium text-roxy-black group-hover:opacity-70 transition-opacity pr-8">
-            {item.question}
+          {/* Strapi sends 'Question' */}
+          <h3 className="text-xl md:text-2xl font-medium text-[#1E1E1E] group-hover:opacity-70 transition-opacity pr-8">
+            {item.Question}
           </h3>
         </div>
 
-        <div className="relative w-6 h-6 flex-shrink-0 text-roxy-black mt-1">
+        <div className="relative w-6 h-6 flex-shrink-0 text-[#1E1E1E] mt-1">
           <motion.div
             initial={false}
             animate={{ rotate: isOpen ? 180 : 0, opacity: isOpen ? 0 : 1 }}
@@ -111,8 +122,9 @@ function FAQItem({
             className="overflow-hidden"
           >
             <div className="pl-0 md:pl-[80px] pb-10 max-w-3xl">
-              <p className="text-lg font-light text-roxy-graphite leading-relaxed">
-                {item.answer}
+              {/* Strapi sends 'Answer' */}
+              <p className="text-lg font-light text-[#1E1E1E] leading-relaxed">
+                {item.Answer}
               </p>
             </div>
           </motion.div>
@@ -122,100 +134,64 @@ function FAQItem({
   );
 }
 
-// Scroll-reactive interlude: reveals an image by "unfurling" from right → left,
-// while the image itself parallax-shifts vertically as you scroll past.
-function UnfurlingImage() {
-  const containerRef = useRef(null);
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ["start end", "end start"],
-  });
+// -----------------------------------------------------------------------------
+// Main Component
+// -----------------------------------------------------------------------------
 
-  const parallaxY = useTransform(scrollYProgress, [0, 1], [-50, 50]);
+export default function FAQSection({ data }: { data?: FAQSectionData }) {
+  // 1. Extract Data
+  const title = data?.SectionTitle || "FAQ";
+  const desc =
+    data?.SupportingText || "Starting a beauty brand involves many details...";
+  const faqs = data?.Questions || [];
 
-  return (
-    <div
-      ref={containerRef}
-      className="relative w-full h-[60vh] md:h-[80vh] my-24 overflow-hidden"
-    >
-      <motion.div
-        // Reveal by animating clipPath from right to left.
-        initial={{ clipPath: "inset(0 100% 0 0)" }}
-        whileInView={{ clipPath: "inset(0 0% 0 0)" }}
-        viewport={{ once: true, margin: "-10% 0px" }}
-        transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
-        className="relative w-full h-full bg-roxy-beige"
-      >
-        <motion.div
-          style={{ y: parallaxY }}
-          className="relative w-full h-[120%] -top-[10%]"
-        >
-          <Image
-            src="/assets/6.jpg"
-            alt="Cosmetic production detail"
-            fill
-            className="object-cover"
-          />
-          <div className="absolute inset-0 bg-black/5" />
-        </motion.div>
+  // 2. Extract Image (ProductShowcase)
+  const interludeImg =
+    getStrapiMedia(data?.ProductShowcase?.url ?? null) || "/assets/6.jpg";
 
-        <div className="absolute top-12 left-12 text-white/80 z-10">
-          <Plus size={20} />
-        </div>
-        <div className="absolute bottom-12 right-12 text-white/80 z-10">
-          <Plus size={20} />
-        </div>
-      </motion.div>
-    </div>
-  );
-}
+  // State
+  const [openId, setOpenId] = useState<number | null>(faqs[0]?.id ?? null);
 
-export default function FAQSection() {
-  // Tracks the single expanded accordion item (or `null` for all collapsed).
-  const [openId, setOpenId] = useState<string | null>(faqs[0]?.id ?? null);
-
-  const toggleFAQ = (id: string) => {
+  const toggleFAQ = (id: number) => {
     setOpenId(openId === id ? null : id);
   };
 
   return (
-    <section className="bg-roxy-white py-24 md:py-32">
+    <section className="bg-white py-24 md:py-32">
       <Container>
-        {/* Section header/copy. */}
+        {/* Header */}
         <div className="max-w-3xl mx-auto text-center mb-16 px-6">
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-5xl md:text-7xl font-medium text-roxy-black tracking-tight mb-8"
+            className="text-5xl md:text-7xl font-medium text-[#1E1E1E] tracking-tight mb-8"
           >
-            FAQ
+            {title}
           </motion.h2>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.1 }}
-            className="text-lg md:text-xl text-roxy-graphite font-light leading-relaxed"
+            className="text-lg md:text-xl text-[#1E1E1E] font-light leading-relaxed"
           >
-            Starting a beauty brand involves many details, from formulation to
-            regulation. Here, we clarify the essentials of our manufacturing
-            process to help you move from concept to shelf with total confidence
-            and transparency.
+            {desc}
           </motion.p>
         </div>
       </Container>
 
-      {/* Visual break between intro and accordion list. */}
-      <UnfurlingImage />
+      {/* Dynamic Interlude Image */}
+      <UnfurlingImage imgUrl={interludeImg} />
 
       <Container>
-        {/* Accordion list. */}
-        <div className="max-w-5xl mx-auto border-t border-roxy-graphite/20">
-          {faqs.map((faq) => (
+        {/* Accordion List */}
+        <div className="max-w-5xl mx-auto border-t border-[#1E1E1E]/20">
+          {faqs.map((faq, index) => (
             <FAQItem
               key={faq.id}
               item={faq}
+              index={index}
               isOpen={openId === faq.id}
               onClick={() => toggleFAQ(faq.id)}
             />
