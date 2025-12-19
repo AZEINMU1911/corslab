@@ -1,19 +1,18 @@
 "use client";
 
+// --- Imports ---
+
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef } from "react";
 import Image from "next/image";
-import { getStrapiMedia } from "@/lib/media"; // 👈 Added this
-import type { ShowcaseData, Product } from "@/types"; // 👈 Updated imports
+import { getStrapiMedia } from "@/lib/media";
+import type { ShowcaseData, Product } from "@/types";
 
-/**
- * ShowcaseSection
- * - Restored to your original Full-Screen Sticky design.
- * - Now powered by Strapi data.
- */
+// --- Main Component ---
 
 export default function ShowcaseSection({ data }: { data?: ShowcaseData }) {
-  // Fallback if data is missing
+  // 1. Normalize CMS data so the UI can render even if Strapi is incomplete.
+  // Why: This avoids hard crashes during initial CMS wiring.
   const products = data?.Product || [];
 
   return (
@@ -27,11 +26,10 @@ export default function ShowcaseSection({ data }: { data?: ShowcaseData }) {
   );
 }
 
-// -----------------------------------------------------------------------------
-// Subcomponent: The Sticky Card
-// -----------------------------------------------------------------------------
+// --- Subcomponents ---
 
 function ProductCard({ product, index }: { product: Product; index: number }) {
+  // 1. Use a per-card ref so each card gets its own scroll timeline.
   const cardRef = useRef(null);
 
   const { scrollYProgress } = useScroll({
@@ -39,19 +37,20 @@ function ProductCard({ product, index }: { product: Product; index: number }) {
     offset: ["start end", "start start"],
   });
 
-  // Text enters as the card reaches the viewport: slides up and fades in.
+  // 2. Animate text based on scroll progress for a "reveal" as the card becomes sticky.
+  // Why: A scroll-tied motion reads premium without requiring user interaction.
   const textParallaxY = useTransform(scrollYProgress, [0, 1], [100, -50]);
   const textOpacity = useTransform(scrollYProgress, [0, 0.3], [0, 1]);
 
-  // 1. Get Image URL from Strapi
+  // 3. Resolve Strapi media to an absolute URL (and keep a local fallback).
   const imgUrl = getStrapiMedia(product.Image?.url ?? null) || "/assets/2.jpg";
 
-  // 2. Format the Index (0 -> "01", 1 -> "02")
+  // 4. Format the index for the UI label (0 -> "01", 1 -> "02").
   const displayId = (index + 1).toString().padStart(2, "0");
 
   return (
     <div ref={cardRef} className="sticky top-0 h-screen w-full overflow-hidden">
-      {/* Background image layer per product. */}
+      {/* --- Background Image Layer --- */}
       <div className="absolute inset-0 w-full h-full">
         <Image
           src={imgUrl}
@@ -59,12 +58,12 @@ function ProductCard({ product, index }: { product: Product; index: number }) {
           fill
           className="object-cover"
           priority={index === 0}
-          unoptimized // 👈 Added: Safety for Localhost images
+          unoptimized
         />
         <div className="absolute inset-0 bg-black/20" />
       </div>
 
-      {/* Foreground text overlay. */}
+      {/* --- Foreground Text Overlay --- */}
       <div className="relative z-10 w-full h-full flex flex-col items-center justify-center text-center px-4">
         <motion.div
           style={{ y: textParallaxY, opacity: textOpacity }}

@@ -1,9 +1,10 @@
-/**
- * IMPORTANT: These interfaces mirror the Strapi v5 response structure.
- * Keys are Case-Sensitive (e.g., "Headline", not "headline").
- */
+// --- Global Types ---
 
-// --- SHARED HELPERS ---
+// NOTE: Keys must match Strapi API response exactly (Capitalized).
+// Why: Strapi v5 responses are case-sensitive, and runtime access like `data.headline`
+// will silently be `undefined` if the CMS key is `Headline`.
+
+// --- Shared Strapi Primitives ---
 export interface StrapiImage {
   url: string;
   alternativeText?: string;
@@ -16,9 +17,8 @@ export interface StrapiButton {
   URL: string | null;
 }
 
-// --- COMPONENT SPECIFIC TYPES ---
+// --- Main Hero Section Data ---
 
-// 1. Main Hero (The big banner)
 export interface MainHeroData {
   Main: {
     Headline: string;
@@ -29,7 +29,8 @@ export interface MainHeroData {
   MaklonButton: StrapiButton;
 }
 
-// 2. About Section (The text + stats)
+// --- About Section Data (Shared CMS Source) ---
+
 export interface StatItem {
   id: number;
   Label: string; // Strapi sends "Label"
@@ -51,7 +52,8 @@ export interface AboutData {
   };
 }
 
-// 3. Process Section
+// --- Process Section Data ---
+
 export interface ProcessStep {
   id: number;
   Step: number;
@@ -59,7 +61,8 @@ export interface ProcessStep {
   Description: string;
 }
 
-// 4. Showcase / Products
+// --- Showcase Section Data ---
+
 export interface Product {
   id: number;
   Name: string; // Strapi sends "Name"
@@ -71,16 +74,17 @@ export interface ShowcaseData {
   Product: Product[];
 }
 
-// 5. FAQ
+// --- FAQ Section Data ---
+
 export interface FAQItemData {
   id: number;
-  Question: string; // 👈 Capitalized (Strapi)
-  Answer: string; // 👈 Capitalized (Strapi)
+  Question: string; // Strapi sends "Question" (capitalized)
+  Answer: string; // Strapi sends "Answer" (capitalized)
 }
 
 export interface FAQSectionData {
   SectionTitle: string;
   SupportingText: string;
   Questions: FAQItemData[];
-  ProductShowcase: StrapiImage; // 👈 The "Unfurling Image"
+  ProductShowcase: StrapiImage; // The "Unfurling Image"
 }

@@ -1,24 +1,12 @@
 "use client";
 
+// --- Imports ---
+
 import { motion } from "framer-motion";
 import { Container } from "@/components/ui/Container";
 import Image from "next/image";
 
-/**
- * CertificationSection
- * - Header/copy + horizontally scrolling "infinite" logo track.
- * - The marquee effect is created by duplicating the logo list and shifting
- *   the track by half its width (`x: ["0%", "-50%"]`).
- *
- * Common edits:
- * - Logos: update `certificationLogos` (src/alt) and ensure assets exist in `public/assets/`
- * - Speed: tweak `transition.duration`
- * - Spacing: tweak the `gap-*` and `px-*` classes on the track wrapper
- */
-
-// -----------------------------------------------------------------------------
-// Content data
-// -----------------------------------------------------------------------------
+// --- Content Data ---
 
 const certificationLogos = [
   { id: "iso", src: "/assets/iso.png", alt: "ISO Certified" },
@@ -29,14 +17,18 @@ const certificationLogos = [
   { id: "derma", src: "/assets/derma.png", alt: "Derma Certified" },
 ];
 
+// --- Main Component ---
+
 export default function CertificationSection() {
-  // Duplicate the list so the marquee can wrap seamlessly.
+  // 1. Duplicate the list so the marquee can wrap seamlessly.
+  // Why: The track shifts by half its width (`x: ["0%", "-50%"]`), so a duplicated
+  // list prevents a "gap" when the first set scrolls out.
   const loopLogos = [...certificationLogos, ...certificationLogos];
 
   return (
     <section className="bg-roxy-white py-24 border-t border-roxy-graphite/10">
       <Container>
-        {/* Section header/copy. */}
+        {/* --- Header / Copy --- */}
         <div className="max-w-3xl mx-auto text-center mb-20">
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
@@ -44,7 +36,6 @@ export default function CertificationSection() {
             viewport={{ once: true }}
             className="text-4xl md:text-6xl font-medium text-roxy-black tracking-tight mb-8"
           >
-            
             International Standard Certification
           </motion.h2>
           <motion.p
@@ -62,14 +53,14 @@ export default function CertificationSection() {
         </div>
       </Container>
 
-      {/* Marquee area (with gradient fades at left/right edges). */}
+      {/* --- Marquee (With Edge Fades) --- */}
       <div className="relative w-full overflow-hidden py-8">
         <div className="absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-roxy-white to-transparent z-10" />
         <div className="absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-roxy-white to-transparent z-10" />
 
         <motion.div
           className="flex items-center gap-16 md:gap-32 w-max px-16"
-          // Shift by half the track because the list is duplicated.
+          // Why: Shift by half the track because the list is duplicated.
           animate={{ x: ["0%", "-50%"] }}
           transition={{
             ease: "linear",

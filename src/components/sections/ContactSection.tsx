@@ -1,58 +1,42 @@
 "use client";
 
+// --- Imports ---
+
 import React, { useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import ReCAPTCHA from "react-google-recaptcha";
-import { CheckCircle2, X } from "lucide-react"; // Make sure you have lucide-react or use an SVG
+import { CheckCircle2, X } from "lucide-react";
 
-/**
- * ContactSection
- * - Contact form with client-side validation + Google ReCAPTCHA.
- * - Submits via `handleSubmit` (currently simulated) and shows a success modal.
- *
- * Structure:
- * - Config: background image + ReCAPTCHA ref
- * - State: form fields, validation errors, submission state, modal visibility
- * - Logic: `validate`, input handlers, submit handler
- * - UI: background layer, success modal, form card
- *
- * Common edits:
- * - Background image: update `BACKGROUND_IMAGE_URL`
- * - ReCAPTCHA: replace `sitekey` with your real key (and wire a real API route)
- * - Submission: replace the simulated API call in `handleSubmit`
- */
+// --- Config ---
 
-// -----------------------------------------------------------------------------
-// Config
-// -----------------------------------------------------------------------------
-
-// Placeholder background (served from `public/`); replace with a real asset path.
+// Why: Keeping static values centralized makes it obvious what to change without
+// hunting through the JSX.
 const BACKGROUND_IMAGE_URL = "/assets/1.jpg";
 
-// -----------------------------------------------------------------------------
-// Main component
-// -----------------------------------------------------------------------------
+// --- Main Component ---
 
 const ContactSection = () => {
-  // --- Form state (field values) ---
+  // 1. Form state (field values).
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     message: "",
   });
 
-  // --- UI + validation state ---
+  // 2. UI + validation state (kept separate so field values stay simple).
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // --- Success state (modal visibility) ---
+  // 3. Success state (modal visibility).
   const [showSuccessModal, setShowSuccessModal] = useState(false);
 
-  // Allows us to reset the ReCAPTCHA widget after a successful submit.
+  // 4. Hold the ReCAPTCHA ref so we can reset it after successful submission.
+  // Why: Re-using the same widget avoids re-mounting/reflow and keeps UX smooth.
   const recaptchaRef = useRef<ReCAPTCHA>(null);
 
-  // --- Validation ---
+  // 5. Validate inputs before "submitting".
+  // Why: Client-side validation provides instant feedback and reduces invalid requests.
   const validate = () => {
     const newErrors: { [key: string]: string } = {};
     if (!formData.name.trim()) newErrors.name = "Full name is required.";
@@ -75,7 +59,7 @@ const ContactSection = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  // --- Input handlers ---
+  // 6. Input handler: update form state and clear per-field errors optimistically.
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
@@ -84,29 +68,29 @@ const ContactSection = () => {
     if (errors[name]) setErrors((prev) => ({ ...prev, [name]: "" }));
   };
 
-  // --- ReCAPTCHA handler ---
+  // 7. ReCAPTCHA handler: store token and clear related validation state.
   const handleCaptchaChange = (token: string | null) => {
     setCaptchaToken(token);
     if (errors.captcha) setErrors((prev) => ({ ...prev, captcha: "" }));
   };
 
-  // --- Submission handler (replace simulated call with real API integration) ---
+  // 8. Submission handler.
+  // Why: Keep this component self-contained; wire a real API route later without changing the UI.
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
 
     if (validate()) {
-      // Simulate API call
+      // 1) Simulate API call (replace with a real endpoint integration later).
       console.log("Form Submitted:", formData, "Token:", captchaToken);
       await new Promise((resolve) => setTimeout(resolve, 1500));
 
-      // SUCCESS ACTIONS:
-      // 1. Clear the form
+      // 2) Success actions: clear the form + reset captcha.
       setFormData({ name: "", email: "", message: "" });
       setCaptchaToken(null);
       recaptchaRef.current?.reset();
 
-      // 2. Show the Modal
+      // 3) Show the success modal for clear user feedback.
       setShowSuccessModal(true);
     }
 
@@ -115,7 +99,7 @@ const ContactSection = () => {
 
   return (
     <section className="relative w-full min-h-screen flex items-center justify-center overflow-hidden py-20">
-      {/* Background layer */}
+      {/* --- Background Layer --- */}
       <div
         className="absolute inset-0 w-full h-full z-0"
         style={{
@@ -127,11 +111,11 @@ const ContactSection = () => {
         <div className="absolute inset-0 bg-black/10" />
       </div>
 
-      {/* Success modal (renders above the page with a backdrop) */}
+      {/* --- Success Modal --- */}
       <AnimatePresence>
         {showSuccessModal && (
           <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
-            {/* Backdrop (click closes modal) */}
+            {/* Why: Backdrop makes focus obvious and allows click-to-dismiss. */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -147,7 +131,7 @@ const ContactSection = () => {
               exit={{ scale: 0.9, opacity: 0, y: 20 }}
               className="relative bg-white rounded-2xl p-8 max-w-sm w-full shadow-2xl text-center z-10"
             >
-              {/* Close Icon (Top Right) */}
+              {/* --- Close Button --- */}
               <button
                 onClick={() => setShowSuccessModal(false)}
                 className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
@@ -155,7 +139,7 @@ const ContactSection = () => {
                 <X size={20} />
               </button>
 
-              {/* Success Icon */}
+              {/* --- Success Icon --- */}
               <div className="mx-auto w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mb-6">
                 <CheckCircle2 size={32} />
               </div>
@@ -179,7 +163,7 @@ const ContactSection = () => {
         )}
       </AnimatePresence>
 
-      {/* Form card (remains visible underneath the modal overlay) */}
+      {/* --- Form Card --- */}
       <motion.div
         layoutId="contact-form-card"
         initial={{ y: 150, opacity: 0 }}

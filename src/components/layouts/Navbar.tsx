@@ -1,15 +1,23 @@
 "use client";
 
+// --- Imports ---
+
 import { useState } from "react";
 import { motion, useScroll, useMotionValueEvent } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
 import { Container } from "@/components/ui/Container";
 
+// --- Main Component ---
+
 export default function Navbar() {
+  // 1. Track scroll position so we can switch the header from "overlay" → "solid".
+  // Why: Transparent nav reads better on top of hero imagery, but a solid nav is
+  // more legible once content scrolls under it.
   const { scrollY } = useScroll();
   const [isScrolled, setIsScrolled] = useState(false);
 
+  // 2. Subscribe to Framer Motion's scroll value updates (no manual listeners).
   useMotionValueEvent(scrollY, "change", (latest) => {
     setIsScrolled(latest > 50);
   });
@@ -23,6 +31,7 @@ export default function Navbar() {
       }`}
     >
       <Container className="flex items-center justify-between h-20 md:h-24">
+        {/* --- Logo Area --- */}
         <Link href="/" className="relative w-10 h-10 md:w-12 md:h-12">
           <Image
             src="/CoslabWhite.png"
@@ -34,6 +43,7 @@ export default function Navbar() {
           />
         </Link>
 
+        {/* --- Desktop Menu --- */}
         <nav className="hidden md:flex items-center gap-8">
           {["Services", "Process", "FAQ", "Contact"].map((item) => (
             <Link
@@ -50,6 +60,8 @@ export default function Navbar() {
           ))}
         </nav>
 
+        {/* --- Mobile Menu Toggle --- */}
+        {/* NOTE: Not implemented yet. This is currently a CTA button on all breakpoints. */}
         <button
           className={`px-6 py-2 rounded-sm text-xs font-bold uppercase tracking-widest border transition-colors ${
             isScrolled

@@ -1,31 +1,25 @@
+// --- Imports ---
+
 import { getStrapiURL } from "./api";
 
-/**
- * Convert a Strapi media URL into a browser-loadable URL.
- *
- * Why we need this helper:
- * - Strapi often returns media as a relative path, for example:
- *   `/uploads/my_image.png`
- * - The browser cannot load that path from the Next.js domain because the file
- *   actually lives on the Strapi server (e.g. `http://127.0.0.1:1337/uploads/...`).
- * - By prefixing the Strapi base URL, we ensure images/videos render correctly
- *   across environments without hardcoding `localhost:1337` all over the UI.
- *
- * Safety behavior:
- * - If the URL is already absolute (S3/Cloudinary/etc), we return it unchanged.
- * - If Strapi returns `null`, we return `null` so components can gracefully
- *   render fallbacks instead of crashing.
- */
+// --- Media Helpers ---
+
+// Why: Strapi media can come back as either:
+// - relative paths (e.g. `/uploads/...`) that need the Strapi base URL prepended
+// - absolute URLs (S3/Cloudinary/etc) that should be used as-is
 export function getStrapiMedia(url: string | null) {
+  // 1. Preserve `null` so UI can render fallbacks instead of crashing.
   if (url == null) {
     return null;
   }
 
-  // Return the full URL if it's already a remote link (e.g. AWS S3)
+  // 2. If Strapi already returned an absolute URL, do not rewrite it.
   if (url.startsWith("http") || url.startsWith("//")) {
     return url;
   }
 
-  // Otherwise, prepend the Strapi URL (localhost:1337)
+  // 3. Otherwise, prefix the Strapi base URL.
+  // Why: `getStrapiURL()` defaults to `http://localhost:1337` when env vars are missing,
+  // keeping local development working without extra setup.
   return `${getStrapiURL()}${url}`;
 }

@@ -1,18 +1,23 @@
 "use client";
 
+// --- Imports ---
+
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { getStrapiMedia } from "@/lib/media";
 import type { MainHeroData } from "@/types";
 
+// --- Main Component ---
+
 export default function MainHero({ data }: { data?: MainHeroData }) {
-  // 1. FIX: Dig into 'data.Main' to find the images
+  // 1. Extract media URLs from the nested `Main` component.
+  // Why: Strapi groups hero fields under `HeroSection.Main`, so we "open the door" (`Main`) first.
   const bgUrl =
     getStrapiMedia(data?.Main?.BackgroundImage?.url ?? null) || "/assets/1.jpg";
   const logoUrl =
     getStrapiMedia(data?.Main?.Logo?.url ?? null) || "/CoslabWhite.png";
 
-  // 2. Text is also inside 'Main'
+  // 2. Extract copy (with fallbacks to prevent a blank/white-screen hero).
   const headline =
     data?.Main?.Headline || "Build Your Beauty Brand with a Trusted Lab";
   const subhead =
@@ -22,27 +27,23 @@ export default function MainHero({ data }: { data?: MainHeroData }) {
 
   return (
     <section className="relative h-screen w-full flex items-center justify-center overflow-hidden bg-gray-900">
-      {/* BACKGROUND LAYER */}
+      {/* --- Background Layer --- */}
       <div className="absolute inset-0 w-full h-full z-0">
-        {/*
-          `unoptimized` is a friendly localhost fix.
-          It tells Next.js Image: "Don't proxy/resize this on the Next server — just let the browser fetch the URL directly."
-          This avoids common dev-time issues when Strapi media + Next image optimization disagree about `localhost` (IPv4 vs IPv6).
-        */}
+        {/* Why: `unoptimized` avoids dev-time failures when Strapi runs on localhost/127.0.0.1 and Next Image optimization cannot reach it reliably. */}
         <Image
           src={bgUrl}
           alt="Hero Background"
           fill
           className="object-cover"
           priority
-          unoptimized={true} // Fix: Bypasses Next.js server optimization to prevent localhost networking errors.
+          unoptimized={true}
         />
         <div className="absolute inset-0 bg-black/20" />
       </div>
 
-      {/* CONTENT LAYER */}
+      {/* --- Content Layer --- */}
       <div className="relative z-10 flex flex-col items-center text-center px-6 max-w-4xl mx-auto space-y-8">
-        {/* Logo */}
+        {/* --- Logo --- */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -54,11 +55,11 @@ export default function MainHero({ data }: { data?: MainHeroData }) {
             alt="Logo"
             fill
             className="object-contain mix-blend-screen"
-            unoptimized={true} // Fix: Bypasses Next.js server optimization to prevent localhost networking errors.
+            unoptimized={true}
           />
         </motion.div>
 
-        {/* Headline */}
+        {/* --- Headline --- */}
         <motion.h1
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -68,7 +69,7 @@ export default function MainHero({ data }: { data?: MainHeroData }) {
           {headline}
         </motion.h1>
 
-        {/* Subheading */}
+        {/* --- Subheading --- */}
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -78,7 +79,7 @@ export default function MainHero({ data }: { data?: MainHeroData }) {
           {subhead}
         </motion.p>
 
-        {/* Button */}
+        {/* --- Primary CTA --- */}
         <motion.button
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}

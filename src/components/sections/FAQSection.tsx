@@ -1,5 +1,7 @@
 "use client";
 
+// --- Imports ---
+
 import { useState, useRef } from "react";
 import {
   motion,
@@ -13,18 +15,18 @@ import { Plus, Minus } from "lucide-react";
 import { getStrapiMedia } from "@/lib/media";
 import type { FAQSectionData, FAQItemData } from "@/types";
 
-// -----------------------------------------------------------------------------
-// Subcomponents
-// -----------------------------------------------------------------------------
+// --- Subcomponents ---
 
-// 1. UPDATED: Accepts 'imgUrl' prop now
 function UnfurlingImage({ imgUrl }: { imgUrl: string }) {
+  // 1. Scope scroll progress to this image container for a local parallax effect.
+  // Why: Keeps the animation predictable and independent of the page layout above/below.
   const containerRef = useRef(null);
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ["start end", "end start"],
   });
 
+  // 2. Translate the image slightly as the user scrolls for visual depth.
   const parallaxY = useTransform(scrollYProgress, [0, 1], [-50, 50]);
 
   return (
@@ -43,7 +45,7 @@ function UnfurlingImage({ imgUrl }: { imgUrl: string }) {
           style={{ y: parallaxY }}
           className="relative w-full h-[120%] -top-[10%]"
         >
-          {/* Dynamic Image from Strapi */}
+          {/* Why: `imgUrl` is already normalized via `getStrapiMedia` in the parent component. */}
           <Image
             src={imgUrl}
             alt="Cosmetic production detail"
@@ -65,7 +67,6 @@ function UnfurlingImage({ imgUrl }: { imgUrl: string }) {
   );
 }
 
-// 2. UPDATED: Reads Capitalized Keys (Question, Answer)
 function FAQItem({
   item,
   index,
@@ -77,7 +78,9 @@ function FAQItem({
   isOpen: boolean;
   onClick: () => void;
 }) {
+  // 1. Format the label for consistent alignment ("01", "02", ...).
   const displayId = String(index + 1).padStart(2, "0");
+
   return (
     <div className="border-b border-[#1E1E1E]/20 last:border-none">
       <button
@@ -88,7 +91,7 @@ function FAQItem({
           <span className="font-mono text-sm text-[#1E1E1E]/60 font-bold tracking-widest min-w-[30px]">
             / {displayId}
           </span>
-          {/* Strapi sends 'Question' */}
+          {/* NOTE: Strapi sends capitalized keys (`Question`, `Answer`). */}
           <h3 className="text-xl md:text-2xl font-medium text-[#1E1E1E] group-hover:opacity-70 transition-opacity pr-8">
             {item.Question}
           </h3>
@@ -122,7 +125,7 @@ function FAQItem({
             className="overflow-hidden"
           >
             <div className="pl-0 md:pl-[80px] pb-10 max-w-3xl">
-              {/* Strapi sends 'Answer' */}
+              {/* NOTE: Strapi sends capitalized keys (`Question`, `Answer`). */}
               <p className="text-lg font-light text-[#1E1E1E] leading-relaxed">
                 {item.Answer}
               </p>
@@ -134,22 +137,20 @@ function FAQItem({
   );
 }
 
-// -----------------------------------------------------------------------------
-// Main Component
-// -----------------------------------------------------------------------------
+// --- Main Component ---
 
 export default function FAQSection({ data }: { data?: FAQSectionData }) {
-  // 1. Extract Data
+  // 1. Extract CMS fields with fallbacks so the section remains readable during setup.
   const title = data?.SectionTitle || "FAQ";
   const desc =
     data?.SupportingText || "Starting a beauty brand involves many details...";
   const faqs = data?.Questions || [];
 
-  // 2. Extract Image (ProductShowcase)
+  // 2. Normalize Strapi media URL (relative vs absolute) and keep a local fallback.
   const interludeImg =
     getStrapiMedia(data?.ProductShowcase?.url ?? null) || "/assets/6.jpg";
 
-  // State
+  // 3. Default-open the first FAQ for an "immediately useful" accordion.
   const [openId, setOpenId] = useState<number | null>(faqs[0]?.id ?? null);
 
   const toggleFAQ = (id: number) => {
@@ -159,7 +160,7 @@ export default function FAQSection({ data }: { data?: FAQSectionData }) {
   return (
     <section className="bg-white py-24 md:py-32">
       <Container>
-        {/* Header */}
+        {/* --- Header --- */}
         <div className="max-w-3xl mx-auto text-center mb-16 px-6">
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
@@ -181,11 +182,11 @@ export default function FAQSection({ data }: { data?: FAQSectionData }) {
         </div>
       </Container>
 
-      {/* Dynamic Interlude Image */}
+      {/* --- Interlude Image (CMS) --- */}
       <UnfurlingImage imgUrl={interludeImg} />
 
       <Container>
-        {/* Accordion List */}
+        {/* --- Accordion List --- */}
         <div className="max-w-5xl mx-auto border-t border-[#1E1E1E]/20">
           {faqs.map((faq, index) => (
             <FAQItem

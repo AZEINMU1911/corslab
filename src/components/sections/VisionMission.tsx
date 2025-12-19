@@ -1,14 +1,19 @@
 "use client";
 
+// --- Imports ---
+
 import { motion } from "framer-motion";
 import { Container } from "@/components/ui/Container";
 import type { AboutData } from "@/types";
 
-// Displays Vision & Mission data. Uses `AboutData` type because it shares the same CMS source as the About Section.
+// --- Main Component ---
+
+// Why: Uses `AboutData` because Strapi exposes Vision/Mission as part of the shared `AboutSection` payload.
 export default function VisionMission({ data }: { data?: AboutData }) {
+  // 1. Guard against missing CMS data.
   if (!data) return null;
 
-  // 1. Extract Strapi Data (with fallbacks just in case)
+  // 2. Extract Strapi data with fallbacks to keep the section readable during CMS setup.
   const visionLabel = data.Vision?.Label || "Vision";
   const visionText =
     data.Vision?.Value ||
@@ -22,9 +27,9 @@ export default function VisionMission({ data }: { data?: AboutData }) {
   return (
     <section className="bg-white py-32">
       <Container>
-        {/* 2-column layout: left decoration, right copy blocks */}
+        {/* --- 2-Column Layout (Decoration + Copy) --- */}
         <div className="grid grid-cols-1 md:grid-cols-12 gap-12 items-start">
-          {/* Left-side decorative plus mark (desktop only). */}
+          {/* --- Decorative Plus (Desktop) --- */}
           <div className="md:col-span-2 hidden md:block pt-2">
             <svg
               width="24"
@@ -39,9 +44,9 @@ export default function VisionMission({ data }: { data?: AboutData }) {
             </svg>
           </div>
 
-          {/* Right-side content stack (Vision + Mission). */}
+          {/* --- Copy Blocks (Vision + Mission) --- */}
           <div className="md:col-span-10 space-y-16 max-w-4xl">
-            {/* Vision */}
+            {/* --- Vision --- */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -51,13 +56,13 @@ export default function VisionMission({ data }: { data?: AboutData }) {
               <h3 className="text-sm font-mono tracking-widest text-[#1E1E1E]/60 uppercase">
                 {visionLabel}
               </h3>
-              {/* UPDATED: Size 5xl as requested */}
+              {/* Why: 5XL is the intended "statement" size for this section. */}
               <p className="text-3xl md:text-5xl font-light text-[#1E1E1E] leading-tight">
                 {visionText}
               </p>
             </motion.div>
 
-            {/* Mission */}
+            {/* --- Mission --- */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -68,7 +73,7 @@ export default function VisionMission({ data }: { data?: AboutData }) {
               <h3 className="text-sm font-mono tracking-widest text-[#1E1E1E]/60 uppercase">
                 {missionLabel}
               </h3>
-              {/* UPDATED: Size 5xl as requested */}
+              {/* Why: Keep typography consistent with Vision for visual symmetry. */}
               <p className="text-3xl md:text-5xl font-light text-[#1E1E1E] leading-tight">
                 {missionText}
               </p>

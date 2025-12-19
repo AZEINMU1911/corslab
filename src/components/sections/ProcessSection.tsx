@@ -1,70 +1,39 @@
 "use client";
 
+// --- Imports ---
+
 import { motion, type Variants } from "framer-motion";
 import { Container } from "@/components/ui/Container";
 import type { ProcessStep } from "@/types";
 
-/**
- * This section is a Client Component (`"use client"`) even though it receives
- * data from the server.
- *
- * Why it must be client-side:
- * - Framer Motion performs animations in the browser (it needs the DOM).
- * - Next.js requires components using client-only libraries to opt into client
- *   rendering via `"use client"`.
- *
- * Data flow (important mental model):
- * - `src/app/page.tsx` (Server Component) fetches CMS data from Strapi.
- * - It passes just the needed slice (`ProcessSection`) into this component.
- * - This component focuses on UI + animation, not networking.
- */
+// --- Types ---
 
-/**
- * The minimal shape of a single "process step" we expect from Strapi.
- *
- * Why we type it:
- * - It documents the contract between Strapi and the frontend.
- * - It helps catch mismatches early (e.g. Strapi field renamed).
- */
-
-/**
- * Props for `ProcessSection`.
- *
- * Why `data` is optional:
- * - When the page is first being wired up, Strapi may not have content yet.
- * - Network issues can cause the fetcher to return `null`.
- * - Making it optional lets the UI fail gracefully instead of throwing.
- */
+// Why `data` is optional: CMS content can be missing during setup, or fetches can fail.
 interface ProcessSectionProps {
   data?: {
     Process: ProcessStep[];
   };
 }
 
-// Animation Settings
+// --- Animation Variants ---
+
+// Why: Define motion variants once so the list remains consistent and tweakable.
 const itemVariants: Variants = {
   hidden: { opacity: 0, y: 30 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
 };
 
+// --- Main Component ---
+
 export default function ProcessSection({ data }: ProcessSectionProps) {
-  /**
-   * Fallback strategy:
-   * - If Strapi returned steps, render them.
-   * - If not, render an empty list (so the section still mounts, but shows `0`).
-   *
-   * Why we don't hardcode fallback steps here:
-   * - Hardcoded steps are great for prototyping, but they can drift from the CMS
-   *   and confuse content editors ("I changed Strapi but the site didn't change").
-   * - If you want a design-time placeholder, consider showing a skeleton UI or a
-   *   short "Content coming soon" message instead of fake content.
-   */
+  // 1. Normalize CMS data to avoid runtime errors when mapping.
+  // Why: We prefer an empty list over hardcoded steps to avoid drifting from the CMS.
   const steps = data?.Process || [];
 
   return (
     <section className="bg-roxy-white py-24">
       <Container>
-        {/* Header */}
+        {/* --- Header --- */}
         <div className="mb-16 flex items-baseline gap-4">
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
@@ -79,7 +48,7 @@ export default function ProcessSection({ data }: ProcessSectionProps) {
           </span>
         </div>
 
-        {/* Dynamic list driven by CMS data (Strapi). */}
+        {/* --- Steps List (CMS-Driven) --- */}
         <div className="flex flex-col border-t border-roxy-graphite/20">
           {steps.map((step) => (
             <motion.div
@@ -90,10 +59,10 @@ export default function ProcessSection({ data }: ProcessSectionProps) {
               viewport={{ once: true, margin: "-50px" }}
               className="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-12 py-8 border-b border-roxy-graphite/20 group cursor-default"
             >
-              {/* Column 1: Number & Title */}
+              {/* --- Column 1: Number + Title --- */}
               <div className="md:col-span-4 flex items-baseline gap-6">
                 <span className="font-mono text-sm text-roxy-black font-bold tracking-widest">
-                  {/* Ensures single digits get a zero (e.g. "1" -> "01") */}
+                  {/* Why: Keep label widths stable by padding single digits ("1" -> "01"). */}
                   {String(step.Step).padStart(2, "0")}
                 </span>
                 <h3 className="text-lg font-bold tracking-widest text-roxy-black uppercase group-hover:text-roxy-graphite transition-colors">
@@ -101,7 +70,7 @@ export default function ProcessSection({ data }: ProcessSectionProps) {
                 </h3>
               </div>
 
-              {/* Column 2: Description */}
+              {/* --- Column 2: Description --- */}
               <div className="md:col-span-8">
                 <p className="text-xl md:text-2xl font-light text-roxy-black leading-relaxed opacity-90">
                   {step.Description}

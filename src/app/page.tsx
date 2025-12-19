@@ -1,3 +1,5 @@
+// --- Imports ---
+
 import { fetchAPI } from "@/lib/api";
 import MainHero from "@/components/sections/MainHeroSection";
 import HeroSection from "@/components/sections/HeroSection";
@@ -10,36 +12,15 @@ import FAQSection from "@/components/sections/FAQSection";
 import CertificationSection from "@/components/sections/CertificationSection";
 import ContactSection from "@/components/sections/ContactSection";
 
-/**
- * `src/app/page.tsx` is a Server Component by default (notice there is no
- * `"use client"` at the top of this file).
- *
- * Why this matters:
- * - Server Components run on the Node.js server, not in the browser.
- * - That means we can safely read server-only environment variables
- *   (like `STRAPI_API_TOKEN` inside `fetchAPI`) without exposing secrets.
- * - Data fetching can happen "close to the source" (Strapi) before the page is
- *   rendered, which keeps the client bundle smaller.
- *
- * Pattern used here:
- * - Define a small async function (`getHomePageData`) that knows how to fetch
- *   this page's CMS data.
- * - Make the page component itself `async` so it can `await` that data and pass
- *   the results down as props to client components that need it.
- */
+// --- Data Fetching (Server Component) ---
 
-/**
- * Fetch the CMS data needed to render the homepage.
- *
- * Deep-populate (Strapi v5):
- * - Strapi will not automatically include nested components, relations, or media.
- * - `populate=*` is often only 1-level deep; nested components can still come back
- *   "closed" (present, but missing their internal fields).
- * - We use explicit deep-populate paths to "open the doors" we need, e.g.:
- *   `populate[HeroSection][populate][Main][populate]=*`
- *   This is required because hero media lives under `HeroSection.Main`.
- */
+// Why: `src/app/page.tsx` is a Server Component by default (no `"use client"`),
+// so it can safely read server-only env vars (e.g. `STRAPI_API_TOKEN`) and fetch
+// directly from Strapi without exposing secrets to the browser.
+
 async function getHomePageData() {
+  // 1. Build an explicit deep-populate query (Strapi v5 does not auto-populate nested components/media).
+  // Why: `populate=*` is often only 1-level deep; nested objects can look "present" but contain `null` media.
   const query =
     "populate[HeroSection][populate][Main][populate]=*&" +
     "populate[HeroSection][populate][MaklonButton][populate]=*&" +
@@ -48,34 +29,47 @@ async function getHomePageData() {
     "populate[ProcessSection][populate]=*&" +
     "populate[FAQSection][populate]=*";
 
+  // 2. Fetch the page document from Strapi (server-only token handled by `fetchAPI`).
   const res = await fetchAPI(`/api/homepage?${query}`);
 
-  // Server Component logs appear in the terminal running `npm run dev`.
+  // 3. Debugging is safe here (Server Component logs go to the dev server terminal).
   console.log("🔍 FULL STRAPI RESPONSE:", JSON.stringify(res, null, 2));
 
   return res?.data;
 }
 
-// 2. Make the component async
+// --- Main Component ---
+
 export default async function Home() {
-  // 3. Fetch the data
+  // 1. Fetch CMS data before rendering so child components receive stable props.
   const strapiData = await getHomePageData();
 
-  // Debug
+  // 2. Quick "did we get anything?" sanity check.
   console.log("🔥 Strapi Data Received:", strapiData ? "Yes" : "No");
 
   return (
     <main className="min-h-screen flex flex-col w-full">
+      {/* --- Hero (CMS) --- */}
       <MainHero data={strapiData?.HeroSection} />
-      {/* Shared CMS source */}
+
+      {/* --- About (Shared CMS Source) --- */}
       <HeroSection data={strapiData?.AboutSection} />
       <ProductBillboard data={strapiData?.AboutSection} />
       <VisionMission data={strapiData?.AboutSection} />
-      {/* Shared CMS source */}
+
+      {/* --- Transitional Visual (Static) --- */}
       <WaveSection />
+
+      {/* --- Showcase (CMS) --- */}
       <ShowcaseSection data={strapiData?.ShowcaseSection} />
+
+      {/* --- Process (CMS) --- */}
       <ProcessSection data={strapiData?.ProcessSection} />
+
+      {/* --- FAQ (CMS) --- */}
       <FAQSection data={strapiData?.FAQSection} />
+
+      {/* --- Trust + Contact (Static/Client) --- */}
       <CertificationSection />
       <ContactSection />
     </main>

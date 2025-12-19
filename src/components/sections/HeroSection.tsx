@@ -1,24 +1,32 @@
 "use client";
 
+// --- Imports ---
+
 import { motion } from "framer-motion";
 import { Container } from "@/components/ui/Container";
 import type { AboutData } from "@/types";
 
+// --- Main Component ---
+
 export default function HeroSection({ data }: { data?: AboutData }) {
+  // 1. Guard against missing CMS data (lets the homepage render partial content).
+  // Why: Strapi entries can be incomplete during setup or temporarily unavailable.
   if (!data) return null;
+
+  // 2. Normalize arrays to avoid runtime errors during mapping.
   const stats = data.Stats || [];
 
   return (
     <section className="py-24 bg-white overflow-hidden">
       <Container>
-        {/* GRID LAYOUT: 1 column for Plus, 11 columns for Content */}
+        {/* --- Layout Grid (Decoration + Content) --- */}
         <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
-          {/* THE BLACK PLUS */}
+          {/* --- Decorative Plus (Desktop) --- */}
           <div className="hidden md:block md:col-span-1">
             <span className="text-5xl font-light text-[#1E1E1E]">+</span>
           </div>
 
-          {/* CONTENT AREA */}
+          {/* --- Content Area --- */}
           <div className="md:col-span-11 flex flex-col items-center text-center">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -26,19 +34,19 @@ export default function HeroSection({ data }: { data?: AboutData }) {
               viewport={{ once: true }}
               transition={{ duration: 0.8 }}
               className="w-full"
-            >
-              <h2 className="text-5xl md:text-7xl font-medium text-[#1E1E1E] mb-8 leading-tight">
-                {data.Headline}
-              </h2>
-              <p className="text-xl md:text-2xl text-[#1E1E1E]/70 font-light mb-20 leading-relaxed max-w-3xl mx-auto">
-                {data.Subtitle}
-              </p>
+              >
+                <h2 className="text-5xl md:text-7xl font-medium text-[#1E1E1E] mb-8 leading-tight">
+                  {data.Headline}
+                </h2>
+                <p className="text-xl md:text-2xl text-[#1E1E1E]/70 font-light mb-20 leading-relaxed max-w-3xl mx-auto">
+                  {data.Subtitle}
+                </p>
 
-              {/* Stats Grid */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-y-12 gap-x-8 border-t border-black/10 pt-16">
-                {stats.map((stat) => (
-                  <div key={stat.id} className="flex flex-col items-center">
-                    <h4 className="text-5xl md:text-7xl font-bold text-[#1E1E1E] mb-3">
+                {/* --- Stats Grid --- */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-y-12 gap-x-8 border-t border-black/10 pt-16">
+                  {stats.map((stat) => (
+                    <div key={stat.id} className="flex flex-col items-center">
+                      <h4 className="text-5xl md:text-7xl font-bold text-[#1E1E1E] mb-3">
                       {stat.Value}
                     </h4>
                     <span className="text-sm font-mono text-[#1E1E1E]/50 uppercase tracking-widest">
