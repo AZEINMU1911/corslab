@@ -1,73 +1,39 @@
 "use client";
 
+// --- Imports ---
+
 import { motion, type Variants } from "framer-motion";
 import { Container } from "@/components/ui/Container";
+import type { ProcessStep } from "@/types";
 
-/**
- * ProcessSection
- * - Simple 4-step process list with per-row in-view reveal animation.
- *
- * Common edits:
- * - Steps copy/order: update the `steps` array
- * - Animation: tweak `itemVariants` or the `viewport` margin per row
- */
+// --- Types ---
 
-// -----------------------------------------------------------------------------
-// Content data
-// -----------------------------------------------------------------------------
+// Why `data` is optional: CMS content can be missing during setup, or fetches can fail.
+interface ProcessSectionProps {
+  data?: {
+    Process: ProcessStep[];
+  };
+}
 
-const steps = [
-  {
-    id: "01",
-    title: "CONSULTATION",
-    description:
-      "In-depth discussion regarding your product concept, categories, quantity targets, and budget alignment.",
-  },
-  {
-    id: "02",
-    title: "SAMPLING",
-    description:
-      "Explore our ready-to-use formulations or develop a custom formula tailored to your specific vision.",
-  },
-  {
-    id: "03",
-    title: "PRODUCTION",
-    description:
-      "High-quality manufacturing process with an estimated efficient turnaround time of 30 to 60 working days.",
-  },
-  {
-    id: "04",
-    title: "LAUNCH SUPPORT",
-    description:
-      "Full assistance with regulatory compliance (BPOM), packaging design, and marketing guidelines for launch.",
-  },
-];
+// --- Animation Variants ---
 
-// -----------------------------------------------------------------------------
-// Animation presets
-// -----------------------------------------------------------------------------
-
-// Reusable Framer Motion variants applied to each row in the steps list.
+// Why: Define motion variants once so the list remains consistent and tweakable.
 const itemVariants: Variants = {
-  hidden: {
-    opacity: 0,
-    y: 30,
-  },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: {
-      duration: 0.6,
-      ease: "easeOut",
-    },
-  },
+  hidden: { opacity: 0, y: 30 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
 };
 
-export default function ProcessSection() {
+// --- Main Component ---
+
+export default function ProcessSection({ data }: ProcessSectionProps) {
+  // 1. Normalize CMS data to avoid runtime errors when mapping.
+  // Why: We prefer an empty list over hardcoded steps to avoid drifting from the CMS.
+  const steps = data?.Process || [];
+
   return (
     <section className="bg-roxy-white py-24">
       <Container>
-        {/* Section title and step count. */}
+        {/* --- Header --- */}
         <div className="mb-16 flex items-baseline gap-4">
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
@@ -78,11 +44,11 @@ export default function ProcessSection() {
             Fast, Simple, Transparent
           </motion.h2>
           <span className="text-xl font-mono text-roxy-graphite opacity-50">
-            / 4
+            / {steps.length}
           </span>
         </div>
 
-        {/* Steps list (each row animates into view once). */}
+        {/* --- Steps List (CMS-Driven) --- */}
         <div className="flex flex-col border-t border-roxy-graphite/20">
           {steps.map((step) => (
             <motion.div
@@ -93,18 +59,21 @@ export default function ProcessSection() {
               viewport={{ once: true, margin: "-50px" }}
               className="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-12 py-8 border-b border-roxy-graphite/20 group cursor-default"
             >
+              {/* --- Column 1: Number + Title --- */}
               <div className="md:col-span-4 flex items-baseline gap-6">
                 <span className="font-mono text-sm text-roxy-black font-bold tracking-widest">
-                  {step.id}
+                  {/* Why: Keep label widths stable by padding single digits ("1" -> "01"). */}
+                  {String(step.Step).padStart(2, "0")}
                 </span>
                 <h3 className="text-lg font-bold tracking-widest text-roxy-black uppercase group-hover:text-roxy-graphite transition-colors">
-                  {step.title}
+                  {step.Title}
                 </h3>
               </div>
 
+              {/* --- Column 2: Description --- */}
               <div className="md:col-span-8">
                 <p className="text-xl md:text-2xl font-light text-roxy-black leading-relaxed opacity-90">
-                  {step.description}
+                  {step.Description}
                 </p>
               </div>
             </motion.div>

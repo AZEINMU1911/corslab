@@ -1,62 +1,64 @@
 "use client";
 
+// --- Imports ---
+
 import { motion } from "framer-motion";
-import { Plus } from "lucide-react";
-import StatsSection from "./StatsSection";
+import { Container } from "@/components/ui/Container";
+import type { AboutData } from "@/types";
 
-/**
- * HeroSection (secondary hero statement)
- * - Large typographic headline + short supporting paragraph
- * - Decorative "plus" icon in the corner (brand motif used elsewhere)
- *
- * Common edits:
- * - Copy: update the `<motion.h1>` and `<motion.p>` text
- * - Motion: tweak the `transition` props for intro timing
- */
-export default function HeroSection() {
+// --- Main Component ---
+
+export default function HeroSection({ data }: { data?: AboutData }) {
+  // 1. Guard against missing CMS data (lets the homepage render partial content).
+  // Why: Strapi entries can be incomplete during setup or temporarily unavailable.
+  if (!data) return null;
+
+  // 2. Normalize arrays to avoid runtime errors during mapping.
+  const stats = data.Stats || [];
+
   return (
-    <section className="relative h-screen w-full flex flex-col justify-center items-center px-6 overflow-hidden">
-      {/* Decorative corner icon. */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.5 }}
-        className="absolute top-12 left-6 md:left-12 text-roxy-black"
-      >
-        <Plus size={24} strokeWidth={1.5} />
-      </motion.div>
+    <section className="py-24 bg-white overflow-hidden">
+      <Container>
+        {/* --- Layout Grid (Decoration + Content) --- */}
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
+          {/* --- Decorative Plus (Desktop) --- */}
+          <div className="hidden md:block md:col-span-1">
+            <span className="text-5xl font-light text-[#1E1E1E]">+</span>
+          </div>
 
-      {/* Centered headline + supporting paragraph. */}
-      <div className="max-w-5xl mx-auto text-center z-10">
-        <motion.h1
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
-          className="text-5xl md:text-7xl lg:text-8xl font-semibold text-roxy-black leading-[1.1] tracking-tight"
-        >
-          Roxy CosLab{" "}
-          <span className="font-light text-roxy-graphite mx-2">—</span> is{" "}
-          <br />
-          Your Trusted Partner.
-        </motion.h1>
+          {/* --- Content Area --- */}
+          <div className="md:col-span-11 flex flex-col items-center text-center">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8 }}
+              className="w-full"
+              >
+                <h2 className="text-5xl md:text-7xl font-medium text-[#1E1E1E] mb-8 leading-tight">
+                  {data.Headline}
+                </h2>
+                <p className="text-xl md:text-2xl text-[#1E1E1E]/70 font-light mb-20 leading-relaxed max-w-3xl mx-auto">
+                  {data.Subtitle}
+                </p>
 
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.3, duration: 0.8 }}
-          className="mt-8 max-w-2xl mx-auto text-roxy-graphite text-lg md:text-xl font-light leading-relaxed"
-        >
-          We blend{" "}
-          <span className="font-medium text-roxy-black">
-            Clinical Precision
-          </span>{" "}
-          with{" "}
-          <span className="font-medium text-roxy-black">Practical Luxury</span>.
-          The premier OEM partner for skincare and bodycare brands.
-        </motion.p>
-      </div>
-      {/* Using stats section inside HeroSection */}
-      <StatsSection />
+                {/* --- Stats Grid --- */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-y-12 gap-x-8 border-t border-black/10 pt-16">
+                  {stats.map((stat) => (
+                    <div key={stat.id} className="flex flex-col items-center">
+                      <h4 className="text-5xl md:text-7xl font-bold text-[#1E1E1E] mb-3">
+                      {stat.Value}
+                    </h4>
+                    <span className="text-sm font-mono text-[#1E1E1E]/50 uppercase tracking-widest">
+                      {stat.Label}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </Container>
     </section>
   );
 }

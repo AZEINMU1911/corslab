@@ -1,22 +1,27 @@
+// --- Imports ---
+
 import { Container } from "@/components/ui/Container";
 import Link from "next/link";
-import Image from "next/image"; // 1. Import Image component
+import Image from "next/image";
+
+// --- Main Component ---
 
 export default function Footer() {
   return (
     <footer className="bg-roxy-black text-white pt-24 pb-12 border-t border-white/10">
       <Container>
         <div className="grid grid-cols-1 md:grid-cols-12 gap-12 md:gap-8 mb-24">
+          {/* --- Brand Column --- */}
           <div className="md:col-span-5 space-y-8">
-            {/* 2. Replaced the <h2> text with Image */}
+            {/* Why: Use the brand lockup asset for consistent marketing typography. */}
             <Link href="/" className="block w-fit">
               <Image
                 src="/CoslabFull.png"
                 alt="Roxy Coslab"
-                width={200} // Adjust width as needed
-                height={60} // Adjust height to match aspect ratio
+                width={200}
+                height={60}
                 className="object-contain"
-                priority // Loads it immediately since it's above the fold (sometimes) or important branding
+                priority
               />
             </Link>
 
@@ -28,6 +33,7 @@ export default function Footer() {
 
           <div className="md:col-span-3" />
 
+          {/* --- Links Column --- */}
           <div className="md:col-span-2 space-y-6">
             <h4 className="font-mono text-xs tracking-widest text-roxy-graphite uppercase">
               Company
@@ -46,6 +52,7 @@ export default function Footer() {
             </ul>
           </div>
 
+          {/* --- Contact Column --- */}
           <div className="md:col-span-2 space-y-6">
             <h4 className="font-mono text-xs tracking-widest text-roxy-graphite uppercase">
               Connect

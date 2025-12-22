@@ -1,72 +1,63 @@
 "use client";
 
+// --- Imports ---
+
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef } from "react";
 import Image from "next/image";
+import { getStrapiMedia } from "@/lib/media";
+import type { AboutData } from "@/types";
 
-/**
- * ProductBillboard
- * - Full-width image billboard with subtle vertical parallax on scroll.
- * - Decorative corner "plus" marks are inline SVGs (no icon dependency).
- *
- * Common edits:
- * - Billboard image: update `src="/assets/4.jpg"`
- * - Parallax strength: tweak the `imageY` range below
- */
-export default function ProductBillboard() {
-  // Local ref so the parallax progress is scoped to this section only.
-  const containerRef = useRef(null);
+// --- Main Component ---
+
+export default function ProductBillboard({ data }: { data?: AboutData }) {
+  // 1. Scope the scroll progress to this section so the parallax only responds
+  // while the billboard is in view.
+  const containerRef = useRef<HTMLDivElement>(null);
+
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ["start end", "end start"],
   });
 
-  // Moves the image slower than the page scroll to create depth.
-  const imageY = useTransform(scrollYProgress, [0, 1], [-100, 100]);
+  // 2. Translate the background image as the user scrolls for a "slow pan" feel.
+  // Why: Parallax adds depth without changing layout.
+  const y = useTransform(scrollYProgress, [0, 1], ["-25%", "25%"]);
+
+  // 3. Resolve Strapi media to a browser-loadable URL (with a local fallback).
+  const imgUrl =
+    getStrapiMedia(data?.ProductImage?.url ?? null) || "/assets/4.jpg";
 
   return (
     <section
       ref={containerRef}
-      className="relative w-full h-[80vh] overflow-hidden bg-roxy-white"
+      className="relative h-[90vh] w-full overflow-hidden bg-[#E8DCCF]"
     >
-      {/* Parallax image layer. */}
+      {/* --- Background Image --- */}
       <motion.div
-        style={{ y: imageY }}
-        className="absolute inset-0 w-full h-[120%] -top-[10%]"
+        style={{ y }}
+        className="absolute inset-0 w-full h-[125%] -top-[12.5%]"
       >
         <Image
-          src="/assets/4.jpg"
-          alt="Cosmetic Billboard"
+          src={imgUrl}
+          alt={data?.ProductImage?.alternativeText || "Product Showcase"}
           fill
           className="object-cover"
+          priority
+          unoptimized
         />
-        <div className="absolute inset-0 bg-black/10" />
       </motion.div>
 
-      {/* Decorative corner marks */}
-      <div className="absolute top-12 left-12 text-white/80">
-        <svg
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-        >
-          <path d="M12 5v14M5 12h14" />
-        </svg>
-      </div>
-      <div className="absolute bottom-12 right-12 text-white/80">
-        <svg
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-        >
-          <path d="M12 5v14M5 12h14" />
-        </svg>
+      {/* --- Contrast Overlay --- */}
+      <div className="absolute inset-0 bg-black/5" />
+
+      {/* --- Decorative Plus Marks --- */}
+      <div className="absolute inset-0 pointer-events-none p-8 md:p-12 flex flex-col justify-between">
+        {/* Top Left */}
+        <div className="text-white/80 text-5xl font-light">+</div>
+
+        {/* Bottom Right */}
+        <div className="text-white/80 text-5xl font-light self-end">+</div>
       </div>
     </section>
   );

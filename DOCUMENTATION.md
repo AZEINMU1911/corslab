@@ -1,121 +1,216 @@
-# Roxy Web — Project Documentation
+# 📘 Roxy Web — Developer Runbook
 
-## Overview
-This repository contains a marketing/landing site for **Roxy CosLab** built with **Next.js (App Router)**, **React**, **TypeScript**, **Tailwind CSS v4**, and **Framer Motion**.
+**"I just got back from vacation. What do I do?"**
+This manual assumes you have forgotten everything. Follow the recipes below to run, build, and fix the project.
 
-The home page is a stack of “sections” (hero, stats, billboard, FAQ, etc.) composed in `src/app/page.tsx`.
+---
 
-## Tech Stack
-- Framework: Next.js (`src/app/*` App Router)
-- UI: React 19 + TypeScript
-- Styling: Tailwind CSS v4 (via `@import "tailwindcss"`) + design tokens in `src/app/globals.css`
-- Animation: Framer Motion (including scroll-driven animations via `useScroll` + `useTransform`)
-- Icons: `lucide-react`
+## ⚡ 0. Quick Start (Start Here)
 
-## Getting Started
-### Prerequisites
-- Node.js (LTS recommended)
-- npm (this repo includes `package-lock.json`)
+You need **two terminals** open to run this project.
 
-### Install & Run
-- Install dependencies: `npm install`
-- Start dev server: `npm run dev`
-- Lint: `npm run lint`
-- Production build: `npm run build` (configured to use Webpack via `--webpack`)
-- Start production server: `npm run start`
+**Terminal 1: The Backend (CMS)**
+1. `cd roxy-strapi` (or whatever your backend folder is named)
+2. `npm run develop`
+   - **Admin Panel:** [http://127.0.0.1:1337/admin](http://127.0.0.1:1337/admin)
+   - **API Endpoint:** [http://127.0.0.1:1337/api](http://127.0.0.1:1337/api)
 
-## Project Structure
-- `src/app/layout.tsx` — Root layout (fonts, global CSS, `Navbar`, `Footer`)
-- `src/app/page.tsx` — Home page composition (section order)
-- `src/app/globals.css` — Tailwind v4 theme tokens (brand colors + fonts)
-- `src/components/layouts/Navbar.tsx` — Sticky header; changes style after scroll
-- `src/components/layouts/Footer.tsx` — Footer layout
-- `src/components/ui/Container.tsx` — Shared max-width + horizontal padding wrapper
-- `src/components/sections/*` — Individual landing page sections
-- `src/types/index.ts` — Shared TypeScript types for sections (e.g., `Product`, `FAQItemData`)
-- `public/` — Static assets served from the site root
-  - `public/assets/*` — Images and videos used by sections
-  - `public/CoslabWhite.png` — Brand logo used in multiple sections
+**Terminal 2: The Frontend (Website)**
+1. `cd roxy-web`
+2. `npm run dev`
+   - **Website:** [http://localhost:3000](http://localhost:3000)
 
-## Section Components (Home Page)
-The section order is defined in `src/app/page.tsx`:
-- `MainHeroSection` — Full-screen hero with background image + logo + CTA
-- `HeroSection` — Secondary hero statement
-- `StatsSection` — Animated counters (Framer Motion spring + in-view trigger)
-- `ProductBillboard` — Parallax billboard image
-- `VisionMission` — Two-column “Vision / Mission” copy block
-- `WaveSection` — Scroll-driven “wave” video background with staged logo → headline transition
-- `ShowcaseSection` — Sticky stacked product cards; scroll drives text parallax + fade-in
-- `ProcessSection` — 4-step process list with per-item in-view animation
-- `FAQSection` — Accordion + unfurling parallax image reveal
-- `CertificationSection` — Infinite-loop certification carousel
-- `ContactSection` — Validated contact form with ReCAPTCHA + success modal
+> **⚠️ CRITICAL RULE:** The Frontend **cannot** work without the Backend running. If the website is blank, check Terminal 1.
 
-## Section Maintenance Guide (Quick Edits)
-All section components live in `src/components/sections/` and most are client components (`"use client"`) because they use Framer Motion hooks.
+---
 
-### How Section Files Are Organized
-Most section files follow the same internal structure (mirrors the labels you’ll see in code comments):
-- **Content data** — hardcoded arrays used to render lists (`products`, `steps`, `faqs`, etc.)
-- **Subcomponents** — helper components used only by that section (`ProductCard`, `FAQItem`, `Counter`, etc.)
-- **Main component** — the exported section component rendered by `src/app/page.tsx`
+## ✅ 0.1 Prereqs (Before you do anything)
 
-### Where to Change What
-- `src/components/sections/MainHeroSection.tsx` — Background image (`/assets/1.jpg`), logo (`/CoslabWhite.png`), hero headline/subcopy, CTA button label.
-- `src/components/sections/HeroSection.tsx` — Big headline + paragraph copy (no shared data arrays).
-- `src/components/sections/StatsSection.tsx` — Update the `stats` array; adjust count-up feel in `Counter` (`useSpring` config).
-- `src/components/sections/ProductBillboard.tsx` — Billboard image (`/assets/4.jpg`); adjust parallax strength via `imageY` transform range.
-- `src/components/sections/VisionMission.tsx` — Update the Vision/Mission copy; adjust the grid columns/spacing if layout changes.
-- `src/components/sections/WaveSection.tsx` — Video (`/assets/wave.mp4`), logo, and headline copy; timing is controlled by the `useTransform` ranges tied to `scrollYProgress`.
-- `src/components/sections/ShowcaseSection.tsx` — Update the `products` array (IDs, titles, subtitles, image paths); per-card text motion lives in `ProductCard`.
-- `src/components/sections/ProcessSection.tsx` — Update the `steps` array; animation tuning is in `itemVariants` + per-row `viewport` settings.
-- `src/components/sections/FAQSection.tsx` — Update the `faqs` array; the image interlude is `UnfurlingImage` (`/assets/6.jpg`); accordion expand/collapse animation is in `FAQItem`.
-- `src/components/sections/CertificationSection.tsx` — Update `certificationLogos` (ensure assets exist under `public/assets/`); marquee speed is `transition.duration`.
-- `src/components/sections/ContactSection.tsx` — Replace `BACKGROUND_IMAGE_URL`, update the ReCAPTCHA `sitekey`, and replace the simulated submission inside `handleSubmit`.
+**Required**
+- Node.js LTS (use whatever the team standard is; if unsure, use the newest LTS).
+- npm (or your repo’s preferred package manager).
+- Git.
 
-### Common Patterns Used in Sections
-- **In-view reveals:** `whileInView` + `viewport={{ once: true }}` for one-time entrance animations.
-- **Scroll progress animations:** `useScroll({ target, offset })` + `useTransform(scrollYProgress, ...)` to map scroll progress to CSS transforms/opacity.
-- **Sticky scroll storytelling:** a tall container (e.g. `h-[250vh]`) + a sticky child (`sticky top-0 h-screen`) to create a pinned stage.
+**Recommended**
+- VS Code.
+- Useful extensions: ESLint, Prettier, Tailwind CSS IntelliSense.
 
-## Contact Form Notes
-`ContactSection` is currently client-only and simulates an API call on submit.
+**Verify your setup**
+- `node -v`
+- `npm -v`
 
-Recommended production wiring:
-1. Create an API route (e.g. `src/app/api/contact/route.ts`) to receive form data.
-2. Verify the ReCAPTCHA token server-side before accepting the request.
-3. Send the message (email/CRM) and return success/failure to drive the modal + error UI.
+---
 
-## Styling & Design Tokens
-Brand tokens live in `src/app/globals.css` under `@theme`:
-- Colors: `--color-roxy-*` (used via Tailwind classes like `bg-roxy-black`)
-- Fonts: `--font-sans`, `--font-mono`
+## 🗺️ 1. Project Map (Where is everything?)
 
-Most components use utility classes directly; layout spacing is typically handled with `Container`.
+| Folder / File | What it does |
+| :--- | :--- |
+| **`src/app/page.tsx`** | **The Brain.** Fetches ALL data from Strapi. If a section is missing/empty, check the `query` string here. |
+| **`src/types/index.ts`** | **The Dictionary.** Defines what the Strapi JSON looks like. If TypeScript yells at you, check this file. |
+| **`src/components/sections/`** | **The UI Blocks.** Individual sections (Hero, FAQ, Process). Edits to *design* happen here. |
+| **`src/lib/media.ts`** | **The Image Handler.** Converts `/uploads/image.jpg` into `http://localhost:1337/uploads/image.jpg`. |
+| **`public/assets/`** | **Local Fallbacks.** Static images used if Strapi fails or for testing. |
 
-### Fonts
-Fonts are loaded via a Google Fonts CSS `@import` in `src/app/globals.css`. This avoids build-time font fetching (useful for restricted build environments), but does require network access in the browser to download fonts unless you switch to locally hosted fonts.
+---
 
-## Assets
-Assets are referenced by absolute paths (served from `public/`), for example:
-- Images: `"/assets/1.jpg"`, `"/assets/6.jpg"`
-- Video: `"/assets/wave.mp4"`
-- Logo: `"/CoslabWhite.png"`
+## 🔑 2. One-Time Setup (Do this once per machine)
 
-To replace an image/video, drop a new file under `public/assets/` and update the relevant `src` in the section component.
+### 2.1 Frontend environment variables
+Create `.env.local` in `roxy-web`:
+- `NEXT_PUBLIC_STRAPI_API_URL=http://127.0.0.1:1337`
+- `NEXT_PUBLIC_STRAPI_API_TOKEN=[Your Long Token]`
 
-## Common Tasks
-### Add a New Section to the Home Page
-1. Create a new component in `src/components/sections/YourSection.tsx`.
-2. Import it into `src/app/page.tsx`.
-3. Place it in the JSX in the desired order.
+> Never commit real tokens. If you need to share setup, share variable names only.
 
-### Update a Scroll Animation
-Most scroll-driven sections follow this pattern:
-- `const { scrollYProgress } = useScroll({ target, offset })`
-- `const x/y/opacity = useTransform(scrollYProgress, ...)`
-- Pass transforms into `motion.*` via `style={{ ... }}`.
+### 2.2 Getting the Strapi API token
+1. Go to Strapi Admin: [http://127.0.0.1:1337/admin](http://127.0.0.1:1337/admin)
+2. Find **API Tokens** (or Settings → API Tokens, depending on Strapi setup).
+3. Create a token with the minimum required permissions for the frontend to read content.
+4. Paste it into `.env.local` as `NEXT_PUBLIC_STRAPI_API_TOKEN`.
 
-## Code Conventions
-- Path alias: `@/*` maps to `src/*` (configured in `tsconfig.json`)
-- Types are colocated in `src/types/index.ts` and imported as `type ... from "@/types"`
+### 2.3 Strapi roles & permissions (common gotcha)
+If the API returns 403/401:
+- In Strapi Admin, ensure the relevant Content Types are readable by the role used by your token (or Public, if applicable).
+
+---
+
+## 🛠️ 3. Golden Commands (The ones you’ll actually use)
+
+### Frontend (Next.js)
+- Install deps: `npm install`
+- Dev server: `npm run dev`
+- Production build: `npm run build`
+- Run production build locally: `npm run start`
+
+### Backend (Strapi)
+- Install deps: `npm install`
+- Dev server: `npm run develop`
+
+### “It’s broken, I want a clean install”
+1. Stop both servers.
+2. Delete `node_modules`.
+3. Reinstall: `npm install`.
+
+> Prefer keeping the lockfile consistent with the repo’s standard (don’t casually switch package managers).
+
+---
+
+## 🧪 4. Smoke Tests (How to know it’s working)
+
+### 4.1 Backend checks (Strapi)
+- Admin loads: [http://127.0.0.1:1337/admin](http://127.0.0.1:1337/admin)
+- API responds: [http://127.0.0.1:1337/api](http://127.0.0.1:1337/api)
+
+If you know the content endpoint used by the homepage, open it in the browser and confirm:
+- Status is 200
+- JSON includes expected fields
+- Media fields include URLs (or relative paths) and are not `null`
+
+### 4.2 Frontend checks (Next.js)
+- Homepage loads: [http://localhost:3000](http://localhost:3000)
+- Hard refresh after content edits: `Cmd+Shift+R` / `Ctrl+Shift+R`
+
+---
+
+## 🛠️ 5. "How-To" Recipes
+
+### 🟢 Recipe A: I want to edit text/images on the site
+**Do NOT touch the code.**
+1. Go to [http://127.0.0.1:1337/admin](http://127.0.0.1:1337/admin).
+2. Click **Content Manager** -> **Homepage**.
+3. Edit the fields.
+4. Click **Save**.
+5. Refresh [http://localhost:3000](http://localhost:3000).
+
+### 🟡 Recipe B: I want to add a NEW Section
+1. **Strapi:** Create Component -> Add to Homepage.
+2. **Types:** Update `src/types/index.ts` (Watch out for Case-Sensitivity!).
+3. **Component:** Create `src/components/sections/NewSection.tsx` (Copy `FAQSection.tsx` structure).
+4. **Wiring:** Update query in `src/app/page.tsx` (`populate[NewSection][populate]=*`).
+
+### 🟠 Recipe C: I changed Strapi content but the UI didn’t update
+1. Confirm the backend is running.
+2. Confirm you edited the correct entry (Homepage vs another type).
+3. Hard refresh the browser.
+4. If still stale, restart `npm run dev`.
+
+---
+
+## 🧠 6. Data Patterns (Read this before debugging “missing data”)
+
+### 6.1 Deep Populate Trap (Strapi v5)
+Strapi v5 does not auto-populate nested components. The API response can look “present” but key fields (especially media) will be `null`/missing unless you explicitly populate nested objects.
+
+**Pattern**
+- `populate[SectionName][populate]=*`
+
+**Concept**
+- You must “open the door” (the nested object) before you can see what’s inside.
+
+### 6.2 Case sensitivity is not optional
+Strapi keys are often capitalized (e.g. `Headline`, `Vision`). Your types and access patterns must match exactly.
+
+---
+
+## 🚨 7. Troubleshooting Cheat Sheet
+
+| Symptom | Likely Cause | The Fix |
+| :--- | :--- | :--- |
+| **White Screen** | Backend is off. | Start Terminal 1 (`npm run develop`). |
+| **401 / 403 from API** | Token/permissions misconfigured. | Check `.env.local` + Strapi roles/permissions for read access. |
+| **Images Broken** | Localhost blocking. | Add `unoptimized={true}` to `<Image />`. |
+| **"Cannot read property"** | Null data from Strapi. | Use optional chaining: `data?.Title`. |
+| **Data Missing** | **Deep Populate Trap.** | Change `populate=*` to `populate[SectionName][populate]=*`. |
+| **Type Error** | **Case Sensitivity.** | Strapi sends `Headline`, not `headline`. Check Types. |
+
+---
+
+## 🧯 8. Debug Playbook (What to check, in order)
+
+1. **Is Strapi running?** If not, nothing else matters.
+2. **Can you hit the Strapi endpoint in the browser?** Confirm status + JSON shape.
+3. **Is the correct section populated?** Missing nested media usually means missing `populate[...]`.
+4. **Check your env vars:** wrong API URL or token breaks everything quietly.
+5. **Check logs:**
+   - Frontend errors: Terminal running `npm run dev`
+   - Backend errors: Terminal running `npm run develop`
+
+---
+
+## ♻️ 9. Recovery / Reset (When your local setup is cursed)
+
+**Safe first moves**
+- Restart both dev servers.
+- Do a clean install (`node_modules` → reinstall).
+- Re-check `.env.local` variables (names + values).
+
+**If Strapi data is the problem**
+- Confirm you’re editing the right content entry.
+- If your team has a seed/backup process, restore from that source (ask in the escalation section below).
+
+> Avoid deleting databases/content unless your team explicitly expects it.
+
+---
+
+## 🚀 10. Deployment Notes (So you don’t panic on release day)
+
+**What changes between local and prod**
+- `NEXT_PUBLIC_STRAPI_API_URL` must point at the hosted Strapi instance.
+- Tokens in production should be least-privilege and stored in the hosting provider’s env settings.
+
+**Common deployment failure modes**
+- Wrong API URL (points to localhost).
+- Missing token env var.
+- Media URLs not accessible publicly (Strapi hosting / CORS / networking).
+
+---
+
+## 🆘 11. When you’re stuck (Escalation checklist)
+
+When asking for help, include:
+- What you were trying to do (1 sentence).
+- The exact endpoint you hit (URL path only; don’t paste secrets).
+- The error message + stack trace.
+- A short snippet of the JSON shape you received (no tokens).
+- What you already tried from Sections 7–9.
+
