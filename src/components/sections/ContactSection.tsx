@@ -12,6 +12,7 @@ import { CheckCircle2, X } from "lucide-react";
 // Why: Keeping static values centralized makes it obvious what to change without
 // hunting through the JSX.
 const BACKGROUND_IMAGE_URL = "/assets/1.jpg";
+const RECAPTCHA_SITE_KEY = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY ?? "";
 
 // --- Main Component ---
 
@@ -252,11 +253,18 @@ const ContactSection = () => {
 
             {/* ReCAPTCHA (must be verified before submission) */}
             <div className="flex flex-col items-center justify-center pt-2">
-              <ReCAPTCHA
-                ref={recaptchaRef}
-                sitekey="6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI" // Remember to change this to your Real Key
-                onChange={handleCaptchaChange}
-              />
+              {RECAPTCHA_SITE_KEY ? (
+                <ReCAPTCHA
+                  ref={recaptchaRef}
+                  sitekey={RECAPTCHA_SITE_KEY}
+                  onChange={handleCaptchaChange}
+                />
+              ) : (
+                <p className="text-red-500 text-xs mt-1">
+                  reCAPTCHA is not configured (missing
+                  {" NEXT_PUBLIC_RECAPTCHA_SITE_KEY"}).
+                </p>
+              )}
               {errors.captcha && (
                 <p className="text-red-500 text-xs mt-1">{errors.captcha}</p>
               )}
